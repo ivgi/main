@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:f="http://java.sun.com/jsf/core" xmlns:h="http://java.sun.com/jsf/html">
+<h:head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+<h:outputStylesheet library="css" name="style.css"/>
+<title>Insert title here</title>
+<script>
+function reservationConfirmation(linkId){
+	document.getElementById(linkId).click();
+	var confirmed = window.confirm("Are you sure you want to reserve this ticket?");
+	
+	if(confirmed){
+		document.getElementById("mainForm").submit();
+		return false;
+	}
+	return true;
+}
+</script>
+</h:head>
+<h:body>
+<div id="container">
+<div id="button_container">
+<h:form id="ajaxForm">
+
+<!-- end of ajax calls -->
+</h:form>
+<h:form id="mainForm">
+<div>
+<h:commandButton value="CLEAR" action="#{reservations.init()}" styleClass="clear_button"/>
+<h:inputText id="username_input" value="#{reservations.username}" />
+</div>
+<!-- ajax calls - temporary reserve ticket prior to confirmation -->
+
+<h:commandButton id="reservePrior0" style="display:none;">
+<f:ajax execute="@form" listener="#{reservations.reserve(0)}"/>
+</h:commandButton>
+<h:commandButton id="reservePrior1" style="display:none;">
+<f:ajax execute="@form" listener="#{reservations.reserve(1)}"/>
+</h:commandButton>
+<h:commandButton id="reservePrior2" style="display:none;">
+<f:ajax execute="@form" listener="#{reservations.reserve(2)}"/>
+</h:commandButton>
+<h:commandButton id="reservePrior3" style="display:none;">
+<f:ajax execute="@form" listener="#{reservations.reserve(3)}"/>
+</h:commandButton>
+<h:commandButton id="reservePrior4" style="display:none;">
+<f:ajax execute="@form" listener="#{reservations.reserve(4)}"/>
+</h:commandButton>
+
+<div style="overflow:hidden;">
+<h:commandLink onclick="return reservationConfirmation('mainForm:reservePrior0')" action="#{reservations.declineReservation(0)}" 
+styleClass="button #{reservations.reservationCheck(0)}" >reserve </h:commandLink>
+<h:commandLink onclick="return reservationConfirmation('mainForm:reservePrior1')" action="#{reservations.declineReservation(1)}" 
+styleClass="button #{reservations.reservationCheck(1)}"> reserve </h:commandLink>
+<h:commandLink onclick=" return reservationConfirmation('mainForm:reservePrior2')" action="#{reservations.declineReservation(2)}" 
+styleClass="button #{reservations.reservationCheck(2)}"> reserve </h:commandLink>
+<h:commandLink onclick="return reservationConfirmation('mainForm:reservePrior3')" action="#{reservations.declineReservation(3)}" 
+styleClass="button #{reservations.reservationCheck(3)}"> reserve </h:commandLink>
+<h:commandLink onclick="return reservationConfirmation('mainForm:reservePrior4')" action="#{reservations.declineReservation(4)}" 
+styleClass="button #{reservations.reservationCheck(4)}"> reserve </h:commandLink>
+</div>
+<div id="message_container">
+<h:outputText  value="Enter your name first." rendered="#{reservations.username == null}"/>
+<h:outputText value="This place is already reserved." rendered="#{reservations.reserved}"/>
+</div>
+<!-- make username null, so that other users see it as null -->
+#{reservations.usernameToNull()}
+#{reservations.reservedToFalse()}
+</h:form>
+
+</div>
+</div>
+</h:body>
+</html>

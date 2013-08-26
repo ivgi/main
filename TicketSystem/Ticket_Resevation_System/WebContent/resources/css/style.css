@@ -1,0 +1,41 @@
+#container{
+	width:600px;
+	height:300px;
+	background-color:#C0C0C0;
+	margin:0px auto;
+}
+
+.button{
+	width:80px;
+	height:20px;
+	display: block;
+	border:1px solid #fff;
+	margin-left:25px;
+	margin-top:50px;
+	text-align:center;
+	padding-bottom:0px;
+	text-decoration:none;
+	float:left;
+	font-weight:bold;
+	color:#fff;
+}
+.green{
+	background-color:green;
+}
+.red{
+	background-color:red;
+}
+.blue{
+	background-color:blue;
+}
+.clear_button{
+	margin:10px 30px;
+	float:clear;
+}
+
+#message_container{
+	margin:0px auto;
+	margin-top:30px;
+	width:80%;
+	
+}
