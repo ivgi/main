@@ -2,6 +2,7 @@
     <wb-module deploy-name="Ticket_Resevation_System">
         <wb-resource deploy-path="/" source-path="/WebContent" tag="defaultRootSource"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/test"/>
         <property name="context-root" value="Ticket_Resevation_System"/>
         <property name="java-output-path" value="/Ticket_Resevation_System/build/classes"/>
     </wb-module>

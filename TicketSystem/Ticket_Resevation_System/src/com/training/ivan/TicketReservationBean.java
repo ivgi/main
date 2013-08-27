@@ -9,6 +9,12 @@ import javax.faces.bean.ManagedBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * 
+ * @author ivaniv
+ * Ticket reservation management bean
+ */
+
 @ManagedBean(name = "reservations", eager = true)
 @ApplicationScoped
 public class TicketReservationBean {
