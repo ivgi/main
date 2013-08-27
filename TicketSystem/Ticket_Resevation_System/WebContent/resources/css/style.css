@@ -24,6 +24,8 @@
 }
 .red{
 	background-color:red;
+	pointer-events: none;
+    cursor: default;
 }
 .blue{
 	background-color:blue;

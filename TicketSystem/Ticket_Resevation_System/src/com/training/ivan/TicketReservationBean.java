@@ -3,26 +3,35 @@ package com.training.ivan;
 import java.util.HashMap;
 
 import javax.annotation.PostConstruct;
-import javax.faces.bean.ApplicationScoped;
+import javax.annotation.PreDestroy;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.SessionScoped;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * 
- * @author ivaniv
- * Ticket reservation management bean
+ * @author ivaniv Ticket reservation management bean
  */
 
-@ManagedBean(name = "reservations", eager = true)
-@ApplicationScoped
+@ManagedBean(name = "reservations")
+@SessionScoped
 public class TicketReservationBean {
 
 	String username;
 	boolean isReserved;
-	HashMap<Integer, String> tickets;
-	Logger logger;
+	Integer ticketRequested;
+	static Logger logger;
+
+	protected static HashMap<Integer, String> tickets;
+	public Integer getTicketRequested() {
+		return ticketRequested;
+	}
+
+	public void setTicketRequested(Integer ticketRequested) {
+		this.ticketRequested = ticketRequested;
+	}
 
 	public boolean isReserved() {
 		return isReserved;
@@ -42,26 +51,39 @@ public class TicketReservationBean {
 
 	@PostConstruct
 	public void init() {
+		if(logger == null)
 		logger = LoggerFactory.getLogger(TicketReservationBean.class);
-		logger.debug("Clearing data ...");
+		
+		if (tickets == null) {
+			tickets = new HashMap<Integer, String>();
+			for (int i = 0; i < 5; i++) {
+				tickets.put(i, null);
+			}
+		}
+		username = null;
+		isReserved = false;
+		ticketRequested = -1;
+		
+		logger.info("Initializing...");
+	}
+	
+	public void clear(){
+		logger.info("Clearing data ...");
 		tickets = new HashMap<Integer, String>();
 		for (int i = 0; i < 5; i++) {
 			tickets.put(i, null);
 		}
-		username = null;
-		isReserved = false;
 		logger.debug("Stopped clearing data ...");
-		logger.info("Initializing...");
-	}
-
-	public void usernameToNull() {
-		logger.debug("username set to null");
-		username = null;
 	}
 
 	public void reservedToFalse() {
 		logger.debug("reserved set to false");
 		isReserved = false;
+	}
+	
+	public void requestedTicket(Integer ticketId){
+		logger.debug("requested ticket is " + ticketId);
+		ticketRequested = ticketId;
 	}
 
 	/**
@@ -96,12 +118,21 @@ public class TicketReservationBean {
 			if (tickets.get(ticketId) == null) {
 				tickets.put(ticketId, username);
 				logger.info(username + " took slot: " + ticketId);
+				isReserved = false;
+				ticketRequested = ticketId;
 			} else {
 				isReserved = true;
 				logger.info(username + " was declined to take slot: "
 						+ ticketId);
 			}
 		}
+	}
+	
+	@PreDestroy
+	public void sessionDestroyed(){
+		if(ticketRequested != -1)
+			tickets.put(ticketRequested,null);
+		logger.debug("predestroy session for user: " + username + " called");
 	}
 
 	/**
@@ -115,6 +146,7 @@ public class TicketReservationBean {
 			logger.info(username + " freed slot: " + ticketId);
 			tickets.put(ticketId, null);
 			isReserved = false;
+			ticketRequested = -1;
 		}
 	}
 }

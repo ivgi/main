@@ -9,9 +9,8 @@
 function reservationConfirmation(linkId){
 	document.getElementById(linkId).click();
 	var confirmed = window.confirm("Are you sure you want to reserve this ticket?");
-	
 	if(confirmed){
-		document.getElementById("mainForm").submit();
+		document.getElementById("ajaxForm:restartTicket").click();
 		return false;
 	}
 	return true;
@@ -22,12 +21,12 @@ function reservationConfirmation(linkId){
 <div id="container">
 <div id="button_container">
 <h:form id="ajaxForm">
-
+<h:commandButton id="restartTicket" type="submit" action="#{reservations.requestedTicket(-1)}" style="display:none;"/>
 <!-- end of ajax calls -->
 </h:form>
 <h:form id="mainForm">
 <div>
-<h:commandButton value="CLEAR" action="#{reservations.init()}" styleClass="clear_button"/>
+<h:commandButton value="CLEAR" action="#{reservations.clear()}" styleClass="clear_button"/>
 <h:inputText id="username_input" value="#{reservations.username}" />
 </div>
 <!-- ajax calls - temporary reserve ticket prior to confirmation -->
@@ -61,12 +60,10 @@ styleClass="button #{reservations.reservationCheck(3)}"> reserve </h:commandLink
 styleClass="button #{reservations.reservationCheck(4)}"> reserve </h:commandLink>
 </div>
 <div id="message_container">
-<h:outputText  value="Enter your name first." rendered="#{reservations.username == null}"/>
+<h:outputText  value="Enter your name first." rendered="#{empty reservations.username}"/>
 <h:outputText value="This place is already reserved." rendered="#{reservations.reserved}"/>
 </div>
-<!-- make username null, so that other users see it as null -->
-#{reservations.usernameToNull()}
-#{reservations.reservedToFalse()}
+
 </h:form>
 
 </div>
