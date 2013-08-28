@@ -24,7 +24,7 @@ public class TicketReservationBean {
 	Integer ticketRequested;
 	static Logger logger;
 
-	protected static HashMap<Integer, String> tickets;
+	protected static volatile HashMap<Integer, String> tickets;
 	public Integer getTicketRequested() {
 		return ticketRequested;
 	}
@@ -111,7 +111,7 @@ public class TicketReservationBean {
 	 * @param ticketId
 	 *            - the number of the ticket
 	 */
-	public void reserve(Integer ticketId) {
+	public synchronized void reserve(Integer ticketId) {
 		if (getUsername() == null || getUsername().isEmpty()) {
 			setUsername(null);
 		} else {
@@ -140,7 +140,7 @@ public class TicketReservationBean {
 	 * 
 	 * @param ticketId
 	 */
-	public void declineReservation(Integer ticketId) {
+	public synchronized void declineReservation(Integer ticketId) {
 		if (tickets.get(ticketId) != null
 				&& tickets.get(ticketId).equals(username)) {
 			logger.info(username + " freed slot: " + ticketId);
