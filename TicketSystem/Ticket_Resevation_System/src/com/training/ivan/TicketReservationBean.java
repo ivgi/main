@@ -23,8 +23,8 @@ public class TicketReservationBean {
 	boolean isReserved;
 	Integer ticketRequested;
 	static Logger logger;
+	private static volatile HashMap<Integer, String> tickets;
 
-	protected static volatile HashMap<Integer, String> tickets;
 	public Integer getTicketRequested() {
 		return ticketRequested;
 	}
@@ -51,9 +51,9 @@ public class TicketReservationBean {
 
 	@PostConstruct
 	public void init() {
-		if(logger == null)
-		logger = LoggerFactory.getLogger(TicketReservationBean.class);
-		
+		if (logger == null)
+			logger = LoggerFactory.getLogger(TicketReservationBean.class);
+
 		if (tickets == null) {
 			tickets = new HashMap<Integer, String>();
 			for (int i = 0; i < 5; i++) {
@@ -63,11 +63,11 @@ public class TicketReservationBean {
 		username = null;
 		isReserved = false;
 		ticketRequested = -1;
-		
+
 		logger.info("Initializing...");
 	}
-	
-	public void clear(){
+
+	public void clear() {
 		logger.info("Clearing data ...");
 		tickets = new HashMap<Integer, String>();
 		for (int i = 0; i < 5; i++) {
@@ -80,8 +80,8 @@ public class TicketReservationBean {
 		logger.debug("reserved set to false");
 		isReserved = false;
 	}
-	
-	public void requestedTicket(Integer ticketId){
+
+	public void requestedTicket(Integer ticketId) {
 		logger.debug("requested ticket is " + ticketId);
 		ticketRequested = ticketId;
 	}
@@ -111,27 +111,29 @@ public class TicketReservationBean {
 	 * @param ticketId
 	 *            - the number of the ticket
 	 */
-	public synchronized void reserve(Integer ticketId) {
+	public void reserve(Integer ticketId) {
 		if (getUsername() == null || getUsername().isEmpty()) {
 			setUsername(null);
 		} else {
-			if (tickets.get(ticketId) == null) {
-				tickets.put(ticketId, username);
-				logger.info(username + " took slot: " + ticketId);
-				isReserved = false;
-				ticketRequested = ticketId;
-			} else {
-				isReserved = true;
-				logger.info(username + " was declined to take slot: "
-						+ ticketId);
+			synchronized (tickets) {
+				if (tickets.get(ticketId) == null) {
+					tickets.put(ticketId, username);
+					logger.info(username + " took slot: " + ticketId);
+					isReserved = false;
+					ticketRequested = ticketId;
+				} else {
+					isReserved = true;
+					logger.info(username + " was declined to take slot: "
+							+ ticketId);
+				}
 			}
 		}
 	}
-	
+
 	@PreDestroy
-	public void sessionDestroyed(){
-		if(ticketRequested != -1)
-			tickets.put(ticketRequested,null);
+	public void sessionDestroyed() {
+		if (ticketRequested != -1)
+			tickets.put(ticketRequested, null);
 		logger.debug("predestroy session for user: " + username + " called");
 	}
 
