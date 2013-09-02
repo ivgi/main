@@ -19,10 +19,10 @@ import org.slf4j.LoggerFactory;
 @SessionScoped
 public class TicketReservationBean {
 
-	String username;
-	boolean isReserved;
-	Integer ticketRequested;
-	static Logger logger;
+	private static final Logger logger = LoggerFactory.getLogger(TicketReservationBean.class);
+	private String username;
+	private boolean isReserved;
+	private Integer ticketRequested;
 	private static volatile HashMap<Integer, String> tickets;
 
 	public Integer getTicketRequested() {
@@ -51,8 +51,6 @@ public class TicketReservationBean {
 
 	@PostConstruct
 	public void init() {
-		if (logger == null)
-			logger = LoggerFactory.getLogger(TicketReservationBean.class);
 
 		if (tickets == null) {
 			tickets = new HashMap<Integer, String>();
