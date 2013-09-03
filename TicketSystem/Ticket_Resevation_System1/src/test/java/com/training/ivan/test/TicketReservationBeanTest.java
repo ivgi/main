@@ -57,7 +57,7 @@ public class TicketReservationBeanTest extends TestCase {
 		bean.setUsername("Petkan");
 		bean.reserve(0);
 
-		assertEquals(bean.isReserved(), true);
+		assertEquals(bean.isTicketReserved(), true);
 		assertEquals("red", bean.reservationCheck(0));
 	}
 
@@ -110,7 +110,7 @@ public class TicketReservationBeanTest extends TestCase {
 		
 		bean.reserve(0);
 		bean2.reserve(0);
-		assertEquals(true, bean2.isReserved());
+		assertEquals(true, bean2.isTicketReserved());
 		assertEquals("blue", bean.reservationCheck(0));
 	}
 	/**

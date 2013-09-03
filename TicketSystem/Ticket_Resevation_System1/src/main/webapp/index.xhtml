@@ -48,7 +48,7 @@ styleClass="button #{reservations.reservationCheck(counter.key)}" >reserve </h:c
 
 <div id="message_container">
 <h:outputText  value="Enter your name first." rendered="#{empty reservations.username}"/>
-<h:outputText  value="This place is already reserved." rendered="#{reservations.reserved}"/>
+<h:outputText  value="This place is already reserved." rendered="#{reservations.isTicketReserved()}"/>
 </div>
 
 </h:form>

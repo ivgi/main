@@ -19,24 +19,17 @@ import org.slf4j.LoggerFactory;
 @SessionScoped
 public class TicketReservationBean {
 
-	private static final Logger logger = LoggerFactory.getLogger(TicketReservationBean.class);
+	private static final Logger logger = LoggerFactory
+			.getLogger(TicketReservationBean.class);
 	private static final int NUMBER_OF_TICKETS = 8;
 	private String username;
-	private boolean isReserved;
+	private int selectedTicket;
 	private Integer ticketRequested;
 
 	private static volatile HashMap<Integer, String> tickets;
 
 	public void setTicketRequested(Integer ticketRequested) {
 		this.ticketRequested = ticketRequested;
-	}
-
-	public boolean isReserved() {
-		return isReserved;
-	}
-
-	public void setReserved(boolean isReserved) {
-		this.isReserved = isReserved;
 	}
 
 	public String getUsername() {
@@ -46,11 +39,18 @@ public class TicketReservationBean {
 	public void setUsername(String username) {
 		this.username = username;
 	}
-	
+
 	public HashMap<Integer, String> getTickets() {
 		return tickets;
 	}
 
+	public int getSelectedTicket() {
+		return selectedTicket;
+	}
+
+	public void setSelectedTicket(int selectedTicket) {
+		this.selectedTicket = selectedTicket;
+	}
 
 	@PostConstruct
 	public void init() {
@@ -61,7 +61,7 @@ public class TicketReservationBean {
 			}
 		}
 		username = null;
-		isReserved = false;
+		selectedTicket = -1;
 		ticketRequested = -1;
 
 		logger.info("Initializing...");
@@ -76,9 +76,9 @@ public class TicketReservationBean {
 		logger.debug("Stopped clearing data ...");
 	}
 
-	public void reservedToFalse() {
+	public void deselected() {
 		logger.debug("reserved set to false");
-		isReserved = false;
+		selectedTicket = -1;
 	}
 
 	public void requestedTicket(Integer ticketId) {
@@ -104,7 +104,23 @@ public class TicketReservationBean {
 		else
 			return "red";
 	}
-	
+
+	/**
+	 * Checks whether the currently clicked ticket is reserved
+	 * 
+	 * @return true if it is reserved, false otherwise
+	 */
+	public boolean isTicketReserved() {
+		logger.debug("Selected ticket is: " + selectedTicket);
+		if (selectedTicket == -1)
+			return false;
+		else if (reservationCheck(selectedTicket).equals("green")
+				|| reservationCheck(selectedTicket).equals("blue"))
+			return false;
+		else
+			return true;
+	}
+
 	/**
 	 * Reserves a ticket to a user if the ticket is free
 	 * 
@@ -112,6 +128,7 @@ public class TicketReservationBean {
 	 *            - the number of the ticket
 	 */
 	public void reserve(Integer ticketId) {
+		selectedTicket = ticketId;
 		if (getUsername() == null || getUsername().isEmpty()) {
 			setUsername(null);
 		} else {
@@ -119,13 +136,10 @@ public class TicketReservationBean {
 				if (tickets.get(ticketId) == null) {
 					tickets.put(ticketId, username);
 					logger.info(username + " took slot: " + ticketId);
-					isReserved = false;
 					ticketRequested = ticketId;
-				} else {
-					isReserved = true;
+				} else
 					logger.info(username + " was declined to take slot: "
 							+ ticketId);
-				}
 			}
 		}
 	}
@@ -147,8 +161,8 @@ public class TicketReservationBean {
 				&& tickets.get(ticketId).equals(username)) {
 			logger.info(username + " freed slot: " + ticketId);
 			tickets.put(ticketId, null);
-			isReserved = false;
 			ticketRequested = -1;
 		}
 	}
+
 }
