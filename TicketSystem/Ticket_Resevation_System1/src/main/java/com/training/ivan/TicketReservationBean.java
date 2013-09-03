@@ -20,14 +20,12 @@ import org.slf4j.LoggerFactory;
 public class TicketReservationBean {
 
 	private static final Logger logger = LoggerFactory.getLogger(TicketReservationBean.class);
+	private static final int NUMBER_OF_TICKETS = 8;
 	private String username;
 	private boolean isReserved;
 	private Integer ticketRequested;
-	private static volatile HashMap<Integer, String> tickets;
 
-	public Integer getTicketRequested() {
-		return ticketRequested;
-	}
+	private static volatile HashMap<Integer, String> tickets;
 
 	public void setTicketRequested(Integer ticketRequested) {
 		this.ticketRequested = ticketRequested;
@@ -48,12 +46,17 @@ public class TicketReservationBean {
 	public void setUsername(String username) {
 		this.username = username;
 	}
+	
+	public HashMap<Integer, String> getTickets() {
+		return tickets;
+	}
+
 
 	@PostConstruct
 	public void init() {
 		if (tickets == null) {
 			tickets = new HashMap<Integer, String>();
-			for (int i = 0; i < 5; i++) {
+			for (int i = 0; i < NUMBER_OF_TICKETS; i++) {
 				tickets.put(i, null);
 			}
 		}
@@ -67,7 +70,7 @@ public class TicketReservationBean {
 	public void clear() {
 		logger.info("Clearing data ...");
 		tickets = new HashMap<Integer, String>();
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < NUMBER_OF_TICKETS; i++) {
 			tickets.put(i, null);
 		}
 		logger.debug("Stopped clearing data ...");
