@@ -51,7 +51,6 @@ public class TicketReservationBean {
 
 	@PostConstruct
 	public void init() {
-
 		if (tickets == null) {
 			tickets = new HashMap<Integer, String>();
 			for (int i = 0; i < 5; i++) {
@@ -64,16 +63,6 @@ public class TicketReservationBean {
 
 		logger.info("Initializing...");
 	}
-	
-		//	/**
-		//	 *  Notifies the user whether the ticket is reserved or not
-		//	 * @return true if the ticket is reserved, false otherwise
-		//	 */
-		//	public boolean reservationNotify(){
-		//		String reservedColor = reservationCheck()
-		//		if(reser)
-		//	}
-
 
 	public void clear() {
 		logger.info("Clearing data ...");
@@ -112,7 +101,7 @@ public class TicketReservationBean {
 		else
 			return "red";
 	}
-
+	
 	/**
 	 * Reserves a ticket to a user if the ticket is free
 	 * 
