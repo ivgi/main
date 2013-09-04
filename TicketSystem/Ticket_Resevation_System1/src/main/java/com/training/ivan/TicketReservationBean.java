@@ -5,6 +5,7 @@ import java.util.HashMap;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 
 import org.slf4j.Logger;
@@ -19,10 +20,11 @@ import org.slf4j.LoggerFactory;
 @SessionScoped
 public class TicketReservationBean {
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(TicketReservationBean.class);
+	private static final Logger logger = LoggerFactory.getLogger(TicketReservationBean.class);
 	private static final int NUMBER_OF_TICKETS = 8;
-	private String username;
+	@ManagedProperty(value="#{login}")
+	private UserLogin login;
+
 	private int selectedTicket;
 	private Integer ticketRequested;
 
@@ -30,14 +32,6 @@ public class TicketReservationBean {
 
 	public void setTicketRequested(Integer ticketRequested) {
 		this.ticketRequested = ticketRequested;
-	}
-
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
 	}
 
 	public HashMap<Integer, String> getTickets() {
@@ -51,6 +45,10 @@ public class TicketReservationBean {
 	public void setSelectedTicket(int selectedTicket) {
 		this.selectedTicket = selectedTicket;
 	}
+	
+	public void setLogin(UserLogin login) {
+		this.login = login;
+	}
 
 	@PostConstruct
 	public void init() {
@@ -60,7 +58,6 @@ public class TicketReservationBean {
 				tickets.put(i, null);
 			}
 		}
-		username = null;
 		selectedTicket = -1;
 		ticketRequested = -1;
 
@@ -99,7 +96,7 @@ public class TicketReservationBean {
 				+ " returned color ");
 		if (tickets.get(ticketNumber) == null)
 			return "green";
-		else if (tickets.get(ticketNumber).equals(username))
+		else if (tickets.get(ticketNumber).equals(login.getUser().getUsername()))
 			return "blue";
 		else
 			return "red";
@@ -129,16 +126,16 @@ public class TicketReservationBean {
 	 */
 	public void reserve(Integer ticketId) {
 		selectedTicket = ticketId;
-		if (getUsername() == null || getUsername().isEmpty()) {
-			setUsername(null);
+		if (login.getUser().getUsername() == null || login.getUser().getUsername().isEmpty()) {
+			login.getUser().setUsername(null);
 		} else {
 			synchronized (tickets) {
 				if (tickets.get(ticketId) == null) {
-					tickets.put(ticketId, username);
-					logger.info(username + " took slot: " + ticketId);
+					tickets.put(ticketId, login.getUser().getUsername());
+					logger.info(login.getUser().getUsername() + " took slot: " + ticketId);
 					ticketRequested = ticketId;
 				} else
-					logger.info(username + " was declined to take slot: "
+					logger.info(login.getUser().getUsername() + " was declined to take slot: "
 							+ ticketId);
 			}
 		}
@@ -148,7 +145,7 @@ public class TicketReservationBean {
 	public void sessionDestroyed() {
 		if (ticketRequested != -1)
 			tickets.put(ticketRequested, null);
-		logger.debug("predestroy session for user: " + username + " called");
+		logger.debug("predestroy session for user: " + login.getUser().getUsername() + " called");
 	}
 
 	/**
@@ -158,8 +155,8 @@ public class TicketReservationBean {
 	 */
 	public synchronized void declineReservation(Integer ticketId) {
 		if (tickets.get(ticketId) != null
-				&& tickets.get(ticketId).equals(username)) {
-			logger.info(username + " freed slot: " + ticketId);
+				&& tickets.get(ticketId).equals(login.getUser().getUsername())) {
+			logger.info(login.getUser().getUsername() + " freed slot: " + ticketId);
 			tickets.put(ticketId, null);
 			ticketRequested = -1;
 		}

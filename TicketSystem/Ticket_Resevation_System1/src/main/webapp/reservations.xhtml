@@ -25,10 +25,11 @@ function reservationConfirmation(linkId){
 <h:commandButton id="restartTicket" type="submit" action="#{reservations.requestedTicket(-1)}" style="display:none;"/>
 <!-- end of ajax calls -->
 </h:form>
-<h:form id="mainForm">
+<h:form id="mainForm" rendered="#{not empty login.user.username}">
 <div>
 <h:commandButton value="CLEAR" action="#{reservations.clear()}" styleClass="clear_button"/>
-<h:inputText id="username_input" value="#{reservations.username}" />
+<h:outputText value="Logged in as #{login.user.username}"/>
+<h:commandLink style="float:right;" actionListener="#{reservations.init()}" value="Logout" action="#{login.logout}"/>
 </div>
 
 <!-- ajax calls - temporary reserve ticket prior to confirmation -->
@@ -47,10 +48,12 @@ styleClass="button #{reservations.reservationCheck(counter.key)}" >reserve </h:c
 </div>
 
 <div id="message_container">
-<h:outputText  value="Enter your name first." rendered="#{empty reservations.username}"/>
+
 <h:outputText  value="This place is already reserved." rendered="#{reservations.isTicketReserved()}"/>
 </div>
-
+</h:form>
+<h:form rendered="#{empty login.user.username}">
+<h:link value="Login" outcome="userLogin"/>
 </h:form>
 
 </div>

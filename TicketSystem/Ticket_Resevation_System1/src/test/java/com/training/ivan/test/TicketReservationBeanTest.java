@@ -3,6 +3,7 @@ package com.training.ivan.test;
 import junit.framework.TestCase;
 
 import com.training.ivan.TicketReservationBean;
+import com.training.ivan.UserLogin;
 
 /**
  * 
@@ -12,6 +13,7 @@ import com.training.ivan.TicketReservationBean;
 public class TicketReservationBeanTest extends TestCase {
 
 	TicketReservationBean bean;
+	UserLogin login;
 
 	public TicketReservationBeanTest(String testName) {
 		super(testName);
@@ -20,6 +22,16 @@ public class TicketReservationBeanTest extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 		bean = new TicketReservationBean();
+		login = new UserLogin();
+		login.init();
+		/*	
+		 * bind the login bean and reservations bean
+		 * In production this is done automatically through the session
+		 * Here we must manually bind it
+		 * If we initialize the bean before binding it to the login bean
+		 * A null pointer exception will be thrown, this is the expected behavior
+		 */
+		bean.setLogin(login); 
 		bean.init();
 	}
 
@@ -30,11 +42,11 @@ public class TicketReservationBeanTest extends TestCase {
 	public void testReservationByTickeId() {
 		bean.clear();
 		// Ivan reserves ticket 0
-		bean.setUsername("Ivan");
+		login.getUser().setUsername("Ivan");
 		bean.reserve(0);
 
 		// Petkan reserves ticket 1
-		bean.setUsername("Petkan");
+		login.getUser().setUsername("Petkan");
 		bean.reserve(1);
 
 		assertEquals("red", bean.reservationCheck(0));
@@ -50,11 +62,11 @@ public class TicketReservationBeanTest extends TestCase {
 	public void testDeclineReservationByTicketId() {
 		bean.clear();
 		// Ivan reserves ticket 0
-		bean.setUsername("Ivan");
+		login.getUser().setUsername("Ivan");
 		bean.reserve(0);
 
 		// Petkan tries to reserve the same ticket
-		bean.setUsername("Petkan");
+		login.getUser().setUsername("Petkan");
 		bean.reserve(0);
 
 		assertEquals(bean.isTicketReserved(), true);
@@ -67,8 +79,8 @@ public class TicketReservationBeanTest extends TestCase {
 
 	public void testNoUsernameReservation() {
 		bean.clear();
-		bean.setUsername(null);
-		assertEquals(null, bean.getUsername());
+		login.getUser().setUsername(null);
+		assertEquals(null, login.getUser().getUsername());
 		assertEquals("green", bean.reservationCheck(0));
 	}
 
@@ -78,7 +90,7 @@ public class TicketReservationBeanTest extends TestCase {
 	 */
 	public void testUserCancelsReservation() {
 		bean.clear();
-		bean.setUsername("Ivan");
+		login.getUser().setUsername("Ivan");
 		bean.reserve(0);
 		assertEquals("blue", bean.reservationCheck(0));
 		bean.declineReservation(0);
@@ -91,9 +103,9 @@ public class TicketReservationBeanTest extends TestCase {
 	 */
 	public void testDeclineReservationNotAccepted() {
 		bean.clear();
-		bean.setUsername("Ivan");
+		login.getUser().setUsername("Ivan");
 		bean.reserve(0);
-		bean.setUsername(null);
+		login.getUser().setUsername(null);
 		bean.declineReservation(0);
 		assertEquals("red", bean.reservationCheck(0));
 	}
@@ -103,10 +115,16 @@ public class TicketReservationBeanTest extends TestCase {
 	 */
 	public void testTwoUsersSimultaniously(){
 		bean.clear();
+		
+		//Second user session initialization
 		TicketReservationBean bean2 = new TicketReservationBean();
+		UserLogin login2 = new UserLogin();
+		login2.init();
+		bean2.setLogin(login2); // binding
 		bean2.init();
-		bean.setUsername("Ivan");
-		bean2.setUsername("Dragan");
+		
+		login.getUser().setUsername("Ivan");
+		login2.getUser().setUsername("Dragan");
 		
 		bean.reserve(0);
 		bean2.reserve(0);
@@ -118,7 +136,7 @@ public class TicketReservationBeanTest extends TestCase {
 	 */
 	public void testSessionKilledByUser(){
 		bean.clear();
-		bean.setUsername("Ivan");
+		login.getUser().setUsername("Ivan");
 		bean.reserve(0);
 		bean.sessionDestroyed();
 		assertEquals("green", bean.reservationCheck(0));
@@ -128,7 +146,7 @@ public class TicketReservationBeanTest extends TestCase {
 	 */
 	public void testSessionKilledByUserReserved(){
 		bean.clear();
-		bean.setUsername("Petkan");
+		login.getUser().setUsername("Petkan");
 		bean.reserve(0);
 		bean.setTicketRequested(-1);
 		bean.sessionDestroyed();
