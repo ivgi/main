@@ -1,7 +1,6 @@
 package com.training.ivan;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -14,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.training.dao.TicketDao;
+import com.training.ivan.data.TicketTableImitation;
 
 /**
  * 
@@ -26,7 +26,6 @@ public class TicketReservationBean {
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(TicketReservationBean.class);
-	private static final int NUMBER_OF_TICKETS = 8;
 
 	@ManagedProperty(value = "#{login}")
 	private UserLogin login;
@@ -57,12 +56,10 @@ public class TicketReservationBean {
 
 	@PostConstruct
 	public void init() {
-		if (tickets == null) {
-			tickets = new ArrayList<Ticket>();
-			for (int i = 0; i < NUMBER_OF_TICKETS; i++) {
-				tickets.add(new Ticket(i, null));
-			}
+		if (TicketTableImitation.tickets == null) {
+			TicketTableImitation.init();
 		}
+		tickets = TicketTableImitation.tickets; // get data from "database"
 		selectedTicket = -1;
 		ticketRequested = -1;
 
@@ -71,12 +68,9 @@ public class TicketReservationBean {
 
 	public void clear() {
 		logger.info("Clearing data ...");
-		tickets = new ArrayList<Ticket>();
-		;
-		for (int i = 0; i < NUMBER_OF_TICKETS; i++) {
-			tickets.add(new Ticket(i, null));
-		}
-		logger.debug("Stopped clearing data ...");
+		TicketTableImitation.clear();
+		tickets = TicketTableImitation.tickets;
+		logger.debug("Done clearing data ...");
 	}
 
 	public void deselected() {

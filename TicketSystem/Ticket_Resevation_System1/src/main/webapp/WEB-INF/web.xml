@@ -2,6 +2,7 @@
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:web="http://xmlns.jcp.org/xml/ns/javaee"
  xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" version="3.0">
 <display-name>Ticket_Resevation_System</display-name>
+<!-- Faces servlet -->
   <servlet>
     <servlet-name>Faces Servlet</servlet-name>
     <servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
@@ -13,10 +14,6 @@
     <url-pattern>*.xhtml</url-pattern>
     <url-pattern>*.jsp</url-pattern>
   </servlet-mapping>
-  <welcome-file-list>
-        <welcome-file>userLogin.xhtml</welcome-file>
-    </welcome-file-list>
-  
   <context-param>
     <description>State saving method: 'client' or 'server' (=default). See JSF Specification 2.5.2</description>
     <param-name>javax.faces.STATE_SAVING_METHOD</param-name>
@@ -26,4 +23,22 @@
     <param-name>javax.servlet.jsp.jstl.fmt.localizationContext</param-name>
     <param-value>resources.application</param-value>
   </context-param>
+  <!-- Welcom files -->
+    <welcome-file-list>
+        <welcome-file>userLogin.xhtml</welcome-file>
+    </welcome-file-list>
+  <!-- Web services servlet -->
+ <servlet>
+        <servlet-name>Jersey Servlet</servlet-name>
+        <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
+        <init-param>
+            <param-name>com.sun.jersey.config.property.packages</param-name>
+            <param-value>com.training.ivan.webservices</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Jersey Servlet</servlet-name>
+        <url-pattern>/rest/*</url-pattern>
+    </servlet-mapping>
 </web-app>
