@@ -33,17 +33,17 @@ function reservationConfirmation(linkId){
 </div>
 
 <!-- ajax calls - temporary reserve ticket prior to confirmation -->
-<ui:repeat id="ajaxRepeater" value="#{reservations.tickets.entrySet().toArray()}"  var="counter">
+<ui:repeat id="ajaxRepeater" value="#{reservations.tickets}"  var="counter">
 <h:commandButton id="ajaxButton" style="display:none;">
-<f:ajax execute="@form" listener="#{reservations.reserve(counter.key)}"/>
+<f:ajax execute="@form" listener="#{reservations.reserve(counter.id)}"/>
 </h:commandButton>
 </ui:repeat>
 
 <!-- ticket buttons -->
 <div style="overflow:hidden;">
-<ui:repeat value="#{reservations.tickets.entrySet().toArray()}"  var="counter">
-<h:commandLink onclick="return reservationConfirmation('mainForm:ajaxRepeater:#{counter.key}:ajaxButton')" action="#{reservations.declineReservation(counter.key)}" 
-styleClass="button #{reservations.reservationCheck(counter.key)}" >reserve </h:commandLink>
+<ui:repeat value="#{reservations.tickets}"  var="counter">
+<h:commandLink onclick="return reservationConfirmation('mainForm:ajaxRepeater:#{counter.id}:ajaxButton')" action="#{reservations.declineReservation(counter.id)}" 
+styleClass="button #{reservations.reservationCheck(counter.id)}" >reserve </h:commandLink>
 </ui:repeat>
 </div>
 
