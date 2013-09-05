@@ -27,12 +27,12 @@ public class TicketReservationBean {
 	private static final Logger logger = LoggerFactory
 			.getLogger(TicketReservationBean.class);
 	private static final int NUMBER_OF_TICKETS = 8;
+
 	@ManagedProperty(value = "#{login}")
 	private UserLogin login;
 
 	private int selectedTicket;
 	private Integer ticketRequested;
-
 	private static volatile List<Ticket> tickets;
 
 	public void setTicketRequested(Integer ticketRequested) {
@@ -132,9 +132,8 @@ public class TicketReservationBean {
 
 	/**
 	 * Reserves a ticket to a user if the ticket is free
-	 * 
-	 * @param ticketId
-	 *            - the number of the ticket
+	 * Locking mechanism implemented through ticketDao bean
+	 * @param ticketId -the number of the ticket
 	 */
 	public void reserve(Integer ticketId) {
 		selectedTicket = ticketId;
@@ -142,17 +141,15 @@ public class TicketReservationBean {
 				|| login.getUser().getUsername().isEmpty()) {
 			login.getUser().setUsername(null);
 		} else {
-			synchronized (tickets) {
-				if (TicketDao.getUsernameByTicketId(ticketId, tickets) == null) {
-					TicketDao.setUsernameByTicketId(ticketId, tickets, login
-							.getUser().getUsername());
-					logger.info(login.getUser().getUsername() + " took slot: "
-							+ ticketId);
-					ticketRequested = ticketId;
-				} else
-					logger.info(login.getUser().getUsername()
-							+ " was declined to take slot: " + ticketId);
-			}
+			if (TicketDao.getUsernameByTicketId(ticketId, tickets) == null) {
+				TicketDao.setUsernameByTicketId(ticketId, tickets, login
+						.getUser().getUsername());
+				logger.info(login.getUser().getUsername() + " took slot: "
+						+ ticketId);
+				ticketRequested = ticketId;
+			} else
+				logger.info(login.getUser().getUsername()
+						+ " was declined to take slot: " + ticketId);
 		}
 	}
 
@@ -169,7 +166,7 @@ public class TicketReservationBean {
 	 * 
 	 * @param ticketId
 	 */
-	public synchronized void declineReservation(Integer ticketId) {
+	public void declineReservation(Integer ticketId) {
 
 		String ticketUsername = TicketDao.getUsernameByTicketId(ticketId,
 				tickets);
