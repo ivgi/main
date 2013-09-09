@@ -1,6 +1,5 @@
 package com.training.ivan.test;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import junit.framework.TestCase;
@@ -8,11 +7,12 @@ import junit.framework.TestCase;
 import com.training.dao.TicketDao;
 import com.training.ivan.Ticket;
 import com.training.ivan.User;
+import com.training.ivan.data.TicketTableImitation;
 
 public class TicketDaoTest extends TestCase {
 	
-	private List<Ticket> tickets;
 	private User user;
+	List<Ticket> tickets;
 	
 	public TicketDaoTest(String testName){
 		super(testName);
@@ -23,38 +23,34 @@ public class TicketDaoTest extends TestCase {
 	 */
 	protected void setUp() throws Exception {
 		
-		tickets = new ArrayList<Ticket>();
+		TicketTableImitation.init();
+		TicketTableImitation.clear(); // make sure the ticket data is cleared
+		tickets = TicketTableImitation.tickets; //TODO real db
 		
 		//add user ivan
-		user = new User();
-		user.setUsername("Ivan");
-		tickets.add(new Ticket(1,user));
+		TicketDao.setUsernameByTicketId(1, "Ivan");
 		
 		//add user dragan
-		user = new User();
-		user.setUsername("Dragan");
-		tickets.add(new Ticket(0,user));
+		TicketDao.setUsernameByTicketId(0, "Dragan");
 		
 		//add user tarzan
-		user = new User();
-		user.setUsername("Tarzan");
-		tickets.add(new Ticket(2,user));
+		TicketDao.setUsernameByTicketId(2, "Tarzan");
 		
 		//add null user
-		tickets.add(new Ticket(3,null));
+		TicketDao.setUsernameByTicketId(3, null);
 		
 	}
 	
 	public void testGetUsernameByTicketId(){
-		assertEquals("Tarzan", TicketDao.getUsernameByTicketId(2, tickets));
-		assertEquals(null,TicketDao.getUsernameByTicketId(3, tickets));
+		assertEquals("Tarzan", TicketDao.getUsernameByTicketId(2));
+		assertEquals(null,TicketDao.getUsernameByTicketId(3));
 	}
 	
 	public void testSetUsernameByTicketId(){
-		TicketDao.setUsernameByTicketId(3, tickets,"Petkan");
-		assertEquals("Petkan",TicketDao.getUsernameByTicketId(3, tickets));
-		TicketDao.setUsernameByTicketId(3, tickets, null);
-		assertEquals(null,TicketDao.getUsernameByTicketId(3, tickets));
+		TicketDao.setUsernameByTicketId(3,"Petkan");
+		assertEquals("Petkan",TicketDao.getUsernameByTicketId(3));
+		TicketDao.setUsernameByTicketId(3, null);
+		assertEquals(null,TicketDao.getUsernameByTicketId(3));
 	}
 	
 

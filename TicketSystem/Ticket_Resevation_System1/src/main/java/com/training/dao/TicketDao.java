@@ -40,9 +40,10 @@ public class TicketDao {
 	 *            - the tickets collection which we will iterate on
 	 * @return - associated user name
 	 */
-	public static String getUsernameByTicketId(Integer id, List<Ticket> tickets) {
+	public static String getUsernameByTicketId(Integer id) {
 		lock.lock();
 		logger.debug("Tickets locked due to reading operation. (Lock on TicketDao acquired)");
+		List<Ticket> tickets = TicketTableImitation.tickets; //TODO getData from real db
 		try {
 			if (tickets != null) {
 				Ticket ticket;
@@ -50,12 +51,12 @@ public class TicketDao {
 				while (iter.hasNext()) {
 					ticket = iter.next();
 					if (id == ticket.getId())
-						return ticket.getUser() == null ? null : ticket
-								.getUser().getUsername();
+						return ticket.getUser() == null ? null : ticket.getUser().getUsername();
 				}
+				logger.debug("ticket id:  " + id + " out of scope ");
 				return null;
 			} else {
-				logger.debug("NullPointer on tickets collection");
+				logger.error("NullPointer on tickets collection");
 				return null;
 			}
 		} finally {
@@ -73,11 +74,11 @@ public class TicketDao {
 	 * @param tickets
 	 *            - the tickets collection which will be updated
 	 */
-	public static void setUsernameByTicketId(Integer id, List<Ticket> tickets,
-			String username) {
+	public static void setUsernameByTicketId(Integer id, String username) {
 		lock.lock();
 		logger.debug("Tickets locked due to writing operation. (Lock on TicketDao acquired by "
 				+ username + "'s thread)");
+		List<Ticket> tickets = TicketTableImitation.tickets; // TODO get data from real db
 		try {
 			if (tickets != null) {
 				Ticket ticket;
@@ -100,7 +101,6 @@ public class TicketDao {
 	}
 	
 	
-	//Dummy method - not used in the system!!
 	/**
 	 * Makes a copy of the arraylist. While reading - the data is locked. A copy
 	 * of the arraylist is needed for synchronization reasons. We need to be
@@ -112,7 +112,7 @@ public class TicketDao {
 		lock.lock();
 		logger.debug("Tickets locked for copy read operation");
 		try{
-		List<Ticket> tickets = new ArrayList<Ticket>(TicketTableImitation.tickets);
+		List<Ticket> tickets = new ArrayList<Ticket>(TicketTableImitation.tickets); // TODO get data from real db
 		logger.debug("Ticket data copied");
 		return tickets;
 		}finally{

@@ -96,8 +96,7 @@ public class TicketReservationBean {
 		logger.debug("Reservation check on: " + ticketNumber
 				+ " returned color ");
 
-		String ticketUsername = TicketDao.getUsernameByTicketId(ticketNumber,
-				tickets);
+		String ticketUsername = TicketDao.getUsernameByTicketId(ticketNumber);
 
 		if (ticketUsername == null)
 			return "green";
@@ -135,8 +134,8 @@ public class TicketReservationBean {
 				|| login.getUser().getUsername().isEmpty()) {
 			login.getUser().setUsername(null);
 		} else {
-			if (TicketDao.getUsernameByTicketId(ticketId, tickets) == null) {
-				TicketDao.setUsernameByTicketId(ticketId, tickets, login
+			if (TicketDao.getUsernameByTicketId(ticketId) == null) {
+				TicketDao.setUsernameByTicketId(ticketId, login
 						.getUser().getUsername());
 				logger.info(login.getUser().getUsername() + " took slot: "
 						+ ticketId);
@@ -150,7 +149,7 @@ public class TicketReservationBean {
 	@PreDestroy
 	public void sessionDestroyed() {
 		if (ticketRequested != -1)
-			TicketDao.setUsernameByTicketId(ticketRequested, tickets, null);
+			TicketDao.setUsernameByTicketId(ticketRequested, null);
 		logger.debug("predestroy session for user: "
 				+ login.getUser().getUsername() + " called");
 	}
@@ -162,14 +161,13 @@ public class TicketReservationBean {
 	 */
 	public void declineReservation(Integer ticketId) {
 
-		String ticketUsername = TicketDao.getUsernameByTicketId(ticketId,
-				tickets);
+		String ticketUsername = TicketDao.getUsernameByTicketId(ticketId);
 
 		if (ticketUsername != null
 				&& ticketUsername.equals(login.getUser().getUsername())) {
 			logger.info(login.getUser().getUsername() + " freed slot: "
 					+ ticketId);
-			TicketDao.setUsernameByTicketId(ticketId, tickets, null);
+			TicketDao.setUsernameByTicketId(ticketId, null);
 			ticketRequested = -1;
 
 		}
