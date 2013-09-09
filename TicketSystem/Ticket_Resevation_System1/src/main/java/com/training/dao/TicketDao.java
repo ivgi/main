@@ -23,12 +23,29 @@ import com.training.ivan.data.TicketTableImitation;
  */
 public class TicketDao {
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(TicketDao.class);
+	private static final Logger logger = LoggerFactory.getLogger(TicketDao.class);
 
 	private static final Lock lock = new ReentrantLock(true); // with fairness
 																// policy
+		private static final boolean useDatabase=false;
 
+//
+
+/*
+	private List<Ticket> getTickets(){
+		
+		if(useDatabase){
+			//get data from database here
+			logger.info("Using data from database");
+		}
+		else{
+			logger.info("Using inMemory data");
+			return TicketTableImitation.tickets;
+		}
+			
+			
+	}
+*/
 	/**
 	 * Finds a username by specified ticket id. Uses the User class. This method
 	 * is synchronized, i.e. only one thread at a time can iterate and read from
@@ -42,9 +59,9 @@ public class TicketDao {
 	 */
 	public static String getUsernameByTicketId(Integer id) {
 		lock.lock();
-		logger.debug("Tickets locked due to reading operation. (Lock on TicketDao acquired)");
-		List<Ticket> tickets = TicketTableImitation.tickets; //TODO getData from real db
 		try {
+			logger.debug("Tickets locked due to reading operation. (Lock on TicketDao acquired)");
+			List<Ticket> tickets = TicketTableImitation.tickets; //TODO getData from real db
 			if (tickets != null) {
 				Ticket ticket;
 				Iterator<Ticket> iter = tickets.iterator();
@@ -76,10 +93,10 @@ public class TicketDao {
 	 */
 	public static void setUsernameByTicketId(Integer id, String username) {
 		lock.lock();
-		logger.debug("Tickets locked due to writing operation. (Lock on TicketDao acquired by "
-				+ username + "'s thread)");
-		List<Ticket> tickets = TicketTableImitation.tickets; // TODO get data from real db
 		try {
+			logger.debug("Tickets locked due to writing operation. (Lock on TicketDao acquired by "
+					+ username + "'s thread)");
+			List<Ticket> tickets = TicketTableImitation.tickets; // TODO get data from real db
 			if (tickets != null) {
 				Ticket ticket;
 				ListIterator<Ticket> iter = tickets.listIterator();
@@ -110,9 +127,9 @@ public class TicketDao {
 	 */
 	public static List<Ticket> readTickets() {
 		lock.lock();
-		logger.debug("Tickets locked for copy read operation");
 		try{
-		List<Ticket> tickets = new ArrayList<Ticket>(TicketTableImitation.tickets); // TODO get data from real db
+		logger.debug("Tickets locked for copy read operation");
+		ArrayList<Ticket> tickets = (ArrayList<Ticket>)(TicketTableImitation.tickets).clone();
 		logger.debug("Ticket data copied");
 		return tickets;
 		}finally{

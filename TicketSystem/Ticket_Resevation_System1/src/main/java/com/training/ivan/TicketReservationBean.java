@@ -1,6 +1,5 @@
 package com.training.ivan;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -59,7 +58,7 @@ public class TicketReservationBean {
 		if (TicketTableImitation.tickets == null) {
 			TicketTableImitation.init();
 		}
-		tickets = TicketTableImitation.tickets; // get data from "database"
+		tickets = TicketTableImitation.tickets; //TODO from real db
 		selectedTicket = -1;
 		ticketRequested = -1;
 
