@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.training.dao.TicketDao;
+import com.training.ivan.data.DataBaseUtil;
 import com.training.ivan.data.TicketTableImitation;
 
 /**
@@ -61,8 +62,8 @@ public class TicketReservationBean {
 		tickets = TicketTableImitation.tickets; //TODO from real db
 		selectedTicket = -1;
 		ticketRequested = -1;
-
 		logger.info("Initializing...");
+		DataBaseUtil.initDB();
 	}
 
 	public void clear() {

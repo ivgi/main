@@ -3,6 +3,7 @@ package com.training.ivan.data;
 import java.util.ArrayList;
 
 import com.training.ivan.Ticket;
+import com.training.ivan.TicketSystemConfig;
 
 /**
  * 
@@ -12,7 +13,6 @@ import com.training.ivan.Ticket;
  */
 public class TicketTableImitation {
 
-	private static final int NUMBER_OF_TICKETS = 8;
 	public static volatile ArrayList<Ticket> tickets;
 
 	/**
@@ -20,8 +20,8 @@ public class TicketTableImitation {
 	 */
 	public static void init() {
 		if (tickets == null) {
-			tickets = new ArrayList<Ticket>(NUMBER_OF_TICKETS);
-			for (int i = 0; i < NUMBER_OF_TICKETS; i++) {
+			tickets = new ArrayList<Ticket>(TicketSystemConfig.NUMBER_OF_TICKETS);
+			for (int i = 0; i < TicketSystemConfig.NUMBER_OF_TICKETS; i++) {
 				tickets.add(new Ticket(i, null));
 			}
 		}

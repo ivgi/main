@@ -137,6 +137,13 @@
 			<version>1.17.1</version>
 		</dependency>
 
+		<!-- Database libraries -->
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.18</version>
+		</dependency>
+
 	</dependencies>
 
 	<!-- Downloaded from java.net -->

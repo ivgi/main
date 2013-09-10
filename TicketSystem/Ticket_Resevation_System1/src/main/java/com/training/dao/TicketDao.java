@@ -25,11 +25,8 @@ public class TicketDao {
 
 	private static final Logger logger = LoggerFactory.getLogger(TicketDao.class);
 
-	private static final Lock lock = new ReentrantLock(true); // with fairness
-																// policy
-		private static final boolean useDatabase=false;
+	private static final Lock lock = new ReentrantLock(true); // with fairness policy
 
-//
 
 /*
 	private List<Ticket> getTickets(){
@@ -104,7 +101,7 @@ public class TicketDao {
 					ticket = (Ticket) iter.next();
 					if (id == ticket.getId()) {
 						User user = new User();
-						user.setUsername(username);
+						user.setUsername(username); //TODO write user in db
 						iter.set(new Ticket(id, user));
 					}
 				}
