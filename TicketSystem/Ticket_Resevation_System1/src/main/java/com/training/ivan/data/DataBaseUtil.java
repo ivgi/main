@@ -56,6 +56,11 @@ public class DataBaseUtil {
 		
 		logger.info("Initializing database ...");
 		Connection con = getDatabaseConnection();
+		if(con == null){
+			logger.info("Database not initialized!");
+			logger.debug("Connection is null");
+			return;
+		}
 		PreparedStatement stm = null;
 		String prepare = "INSERT INTO ticket VALUE ( ? ,NULL)";
 		logger.debug("Preparing statement: \"INSERT INTO ticket VALUE ( ? ,NULL)\"");
@@ -90,6 +95,11 @@ public class DataBaseUtil {
 	
 	public static void clearDB(){
 		Connection con = getDatabaseConnection();
+		if(con == null){
+			logger.info("Database not cleared!");
+			logger.debug("Connection is null");
+			return;
+		}
 		Statement stm = null;
 		logger.info("Clearing db ...");
 		try {

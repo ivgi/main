@@ -56,20 +56,29 @@ public class TicketReservationBean {
 
 	@PostConstruct
 	public void init() {
+		logger.info("Initializing...");
+		
 		if (TicketTableImitation.tickets == null) {
 			TicketTableImitation.init();
 		}
-		tickets = TicketTableImitation.tickets; //TODO from real db
+		
+		tickets = TicketDao.getTickets();
 		selectedTicket = -1;
 		ticketRequested = -1;
-		logger.info("Initializing...");
-		DataBaseUtil.initDB();
+		
 	}
 
 	public void clear() {
 		logger.info("Clearing data ...");
+		
+		//clear inMemory data
 		TicketTableImitation.clear();
-		tickets = TicketTableImitation.tickets;
+		
+		//clear and initialize database data
+		DataBaseUtil.clearDB();
+		DataBaseUtil.initDB();
+		
+		tickets = TicketDao.getTickets();
 		logger.debug("Done clearing data ...");
 	}
 

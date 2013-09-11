@@ -1,5 +1,9 @@
 package com.training.dao;
 
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -11,7 +15,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.training.ivan.Ticket;
+import com.training.ivan.TicketSystemConfig;
 import com.training.ivan.User;
+import com.training.ivan.data.DataBaseUtil;
 import com.training.ivan.data.TicketTableImitation;
 
 /**
@@ -26,14 +32,64 @@ public class TicketDao {
 	private static final Logger logger = LoggerFactory.getLogger(TicketDao.class);
 
 	private static final Lock lock = new ReentrantLock(true); // with fairness policy
+	
+	
+	
+private static ArrayList<Ticket> getTicketsFromDB(){
+	
+	Connection con = DataBaseUtil.getDatabaseConnection();
+	
+	if(con == null)
+	return null;
+	
+	Statement stmt = null;
+	String query = "SELECT id, userId FROM ticket";
+	ArrayList<Ticket> tickets = new ArrayList<Ticket>();
+	
+	try {
+		stmt = con.createStatement();
+		ResultSet rs = stmt.executeQuery(query);
+		while(rs.next()){
+			Integer ticketId = 	rs.getInt("id");
+			Integer userId = rs.getInt("userId");
+			User user = UserDao.getUserById(userId);
+			tickets.add(new Ticket(ticketId,user));
+		}
+	} catch (SQLException e) {
+		logger.error("Getting tickets failed",e);
+	}finally{
+		if(stmt!=null)
+			try {
+				stmt.close();
+				con.close();
+			} catch (SQLException e) {
+				logger.error("Database access errors on close method",e);
+			}
+	}
+	return tickets;
+}
 
-
-/*
-	private List<Ticket> getTickets(){
+/**
+ *  According to USE_DATABASE option, this method gets tickets from the database
+ *  If USE_DATABASE option is disabled inMemory data is used
+ * @return list of all tickets
+ */
+	public static ArrayList<Ticket> getTickets(){
 		
-		if(useDatabase){
-			//get data from database here
+		if(TicketSystemConfig.USE_DATABASE){
+			
+			ArrayList<Ticket> tickets = getTicketsFromDB();
+
+			if(tickets == null){
+				logger.info("PROBLEM WITH THE DATABASE, USING THE INNER MEMORY INSTEAD!");
+				TicketSystemConfig.USE_DATABASE = false;
+				
+				// recursively calling the method
+				// will return inMemory tickets this time
+				return getTickets(); 
+			}
 			logger.info("Using data from database");
+			return tickets;
 		}
 		else{
 			logger.info("Using inMemory data");
@@ -42,7 +98,7 @@ public class TicketDao {
 			
 			
 	}
-*/
+
 	/**
 	 * Finds a username by specified ticket id. Uses the User class. This method
 	 * is synchronized, i.e. only one thread at a time can iterate and read from
@@ -58,7 +114,7 @@ public class TicketDao {
 		lock.lock();
 		try {
 			logger.debug("Tickets locked due to reading operation. (Lock on TicketDao acquired)");
-			List<Ticket> tickets = TicketTableImitation.tickets; //TODO getData from real db
+			List<Ticket> tickets = getTickets();
 			if (tickets != null) {
 				Ticket ticket;
 				Iterator<Ticket> iter = tickets.iterator();
@@ -93,14 +149,14 @@ public class TicketDao {
 		try {
 			logger.debug("Tickets locked due to writing operation. (Lock on TicketDao acquired by "
 					+ username + "'s thread)");
-			List<Ticket> tickets = TicketTableImitation.tickets; // TODO get data from real db
+			List<Ticket> tickets = getTickets();
 			if (tickets != null) {
 				Ticket ticket;
 				ListIterator<Ticket> iter = tickets.listIterator();
 				while (iter.hasNext()) {
 					ticket = (Ticket) iter.next();
 					if (id == ticket.getId()) {
-						User user = new User();
+						User user = new User(username,0); //TODO make the one to many connection user-ticket
 						user.setUsername(username); //TODO write user in db
 						iter.set(new Ticket(id, user));
 					}
