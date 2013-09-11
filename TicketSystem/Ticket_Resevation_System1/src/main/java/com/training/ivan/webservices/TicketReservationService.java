@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import com.training.dao.TicketDao;
 import com.training.ivan.Ticket;
+import com.training.ivan.TicketSystemConfig;
 import com.training.ivan.data.TicketTableImitation;
 
 /**
@@ -39,8 +40,7 @@ public class TicketReservationService {
 	public String getAvailableTicketNumbers() {
 		TicketTableImitation.init();
 		StringBuilder builder = new StringBuilder();
-		List<Ticket> tickets = TicketDao.readTickets(); // get data from
-														// "database"
+		List<Ticket> tickets = TicketDao.getTickets(); 
 
 		// build the xml document
 		builder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>").append(
@@ -91,7 +91,7 @@ public class TicketReservationService {
 
 		if (ticketNum != null) {
 
-			if (ticketNum >= TicketTableImitation.tickets.size()) {
+			if (ticketNum >= TicketSystemConfig.NUMBER_OF_TICKETS) {
 				logger.info("The client provided 'out of scope' ticketId");
 				builder.append("There is no ticket with id: " + ticketNum)
 						.append("</status>");

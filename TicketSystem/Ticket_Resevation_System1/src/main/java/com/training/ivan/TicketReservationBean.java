@@ -65,7 +65,6 @@ public class TicketReservationBean {
 		tickets = TicketDao.getTickets();
 		selectedTicket = -1;
 		ticketRequested = -1;
-		
 	}
 
 	public void clear() {
@@ -172,8 +171,7 @@ public class TicketReservationBean {
 
 		String ticketUsername = TicketDao.getUsernameByTicketId(ticketId);
 
-		if (ticketUsername != null
-				&& ticketUsername.equals(login.getUser().getUsername())) {
+		if (ticketUsername != null && ticketUsername.equals(login.getUser().getUsername())) {
 			logger.info(login.getUser().getUsername() + " freed slot: "
 					+ ticketId);
 			TicketDao.setUsernameByTicketId(ticketId, null);

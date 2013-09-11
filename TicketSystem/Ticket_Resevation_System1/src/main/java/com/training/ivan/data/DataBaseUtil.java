@@ -105,7 +105,7 @@ public class DataBaseUtil {
 		try {
 			stm = con.createStatement();
 			stm.execute("DELETE FROM ticket");
-			stm.execute("DELETE FROM user");
+			stm.execute("DELETE FROM usert");
 			
 			//if more database tables are added to the database
 			//delete statements for this tables must be manually added here

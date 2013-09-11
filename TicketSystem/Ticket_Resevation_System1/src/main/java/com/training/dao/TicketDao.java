@@ -1,6 +1,7 @@
 package com.training.dao;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -29,74 +30,78 @@ import com.training.ivan.data.TicketTableImitation;
  */
 public class TicketDao {
 
-	private static final Logger logger = LoggerFactory.getLogger(TicketDao.class);
+	private static final Logger logger = LoggerFactory
+			.getLogger(TicketDao.class);
 
-	private static final Lock lock = new ReentrantLock(true); // with fairness policy
-	
-	
-	
-private static ArrayList<Ticket> getTicketsFromDB(){
-	
-	Connection con = DataBaseUtil.getDatabaseConnection();
-	
-	if(con == null)
-	return null;
-	
-	Statement stmt = null;
-	String query = "SELECT id, userId FROM ticket";
-	ArrayList<Ticket> tickets = new ArrayList<Ticket>();
-	
-	try {
-		stmt = con.createStatement();
-		ResultSet rs = stmt.executeQuery(query);
-		while(rs.next()){
-			Integer ticketId = 	rs.getInt("id");
-			Integer userId = rs.getInt("userId");
-			User user = UserDao.getUserById(userId);
-			tickets.add(new Ticket(ticketId,user));
-		}
-	} catch (SQLException e) {
-		logger.error("Getting tickets failed",e);
-	}finally{
-		if(stmt!=null)
-			try {
-				stmt.close();
-				con.close();
-			} catch (SQLException e) {
-				logger.error("Database access errors on close method",e);
+	private static final Lock lock = new ReentrantLock(true); // with fairness
+																// policy
+
+	/**
+	 * Retrieves all available tickets from ticket table and adds them to a list
+	 * 
+	 * @return list of tickets
+	 */
+	private static ArrayList<Ticket> getTicketsFromDB() {
+
+		Connection con = DataBaseUtil.getDatabaseConnection();
+
+		if (con == null)
+			return null;
+
+		Statement stmt = null;
+		String query = "SELECT id, userId FROM ticket ORDER BY ID ASC";
+		ArrayList<Ticket> tickets = new ArrayList<Ticket>();
+
+		try {
+			stmt = con.createStatement();
+			ResultSet rs = stmt.executeQuery(query);
+			while (rs.next()) {
+				Integer ticketId = rs.getInt("id");
+				Integer userId = rs.getInt("userId");
+				User user = UserDao.getUserById(userId);
+				//logger.debug("ticket" + ticketId + "- user: " + user);
+				tickets.add(new Ticket(ticketId, user));
 			}
+		} catch (SQLException e) {
+			logger.error("Getting tickets failed", e);
+		} finally {
+			if (stmt != null)
+				try {
+					stmt.close();
+					con.close();
+				} catch (SQLException e) {
+					logger.error("Database access errors on close method", e);
+				}
+		}
+		return tickets;
 	}
-	return tickets;
-}
 
-/**
- *  According to USE_DATABASE option, this method gets tickets from the database
- *  If USE_DATABASE option is disabled inMemory data is used
- * @return list of all tickets
- */
-	public static ArrayList<Ticket> getTickets(){
-		
-		if(TicketSystemConfig.USE_DATABASE){
-			
+	/**
+	 * According to USE_DATABASE option, this method gets tickets from the
+	 * database. If USE_DATABASE option is disabled inMemory data is used
+	 * 
+	 * @return list of all tickets
+	 */
+	public static ArrayList<Ticket> getTickets() {
+
+		if (TicketSystemConfig.USE_DATABASE) {
+
 			ArrayList<Ticket> tickets = getTicketsFromDB();
 
-			if(tickets == null){
+			if (tickets == null) {
 				logger.info("PROBLEM WITH THE DATABASE, USING THE INNER MEMORY INSTEAD!");
 				TicketSystemConfig.USE_DATABASE = false;
-				
+
 				// recursively calling the method
 				// will return inMemory tickets this time
-				return getTickets(); 
+				return getTickets();
 			}
-			logger.info("Using data from database");
 			return tickets;
-		}
-		else{
+		} else {
 			logger.info("Using inMemory data");
 			return TicketTableImitation.tickets;
 		}
-			
-			
+
 	}
 
 	/**
@@ -106,33 +111,22 @@ private static ArrayList<Ticket> getTicketsFromDB(){
 	 * 
 	 * @param id
 	 *            - number of the ticket
-	 * @param tickets
-	 *            - the tickets collection which we will iterate on
 	 * @return - associated user name
 	 */
 	public static String getUsernameByTicketId(Integer id) {
 		lock.lock();
 		try {
 			logger.debug("Tickets locked due to reading operation. (Lock on TicketDao acquired)");
-			List<Ticket> tickets = getTickets();
-			if (tickets != null) {
-				Ticket ticket;
-				Iterator<Ticket> iter = tickets.iterator();
-				while (iter.hasNext()) {
-					ticket = iter.next();
-					if (id == ticket.getId())
-						return ticket.getUser() == null ? null : ticket.getUser().getUsername();
-				}
-				logger.debug("ticket id:  " + id + " out of scope ");
-				return null;
-			} else {
-				logger.error("NullPointer on tickets collection");
-				return null;
-			}
+			Ticket ticket = getTicketById(id);
+			if (ticket != null)
+				return ticket.getUser() == null ? null : ticket.getUser()
+						.getUsername();
 		} finally {
 			lock.unlock();
 			logger.debug("Tickets unlocked, reading operation finished.(Lock on TicketDao released)");
 		}
+
+		return null;
 	}
 
 	/**
@@ -149,28 +143,38 @@ private static ArrayList<Ticket> getTicketsFromDB(){
 		try {
 			logger.debug("Tickets locked due to writing operation. (Lock on TicketDao acquired by "
 					+ username + "'s thread)");
-			List<Ticket> tickets = getTickets();
-			if (tickets != null) {
-				Ticket ticket;
-				ListIterator<Ticket> iter = tickets.listIterator();
-				while (iter.hasNext()) {
-					ticket = (Ticket) iter.next();
-					if (id == ticket.getId()) {
-						User user = new User(username,0); //TODO make the one to many connection user-ticket
-						user.setUsername(username); //TODO write user in db
-						iter.set(new Ticket(id, user));
-					}
-				}
-			} else
-				logger.debug("NullPointer on tickets collection");
+
+			// a reference to a ticket (can be ticket taken from the database or
+			// ticket in the memory). Here ticket can't be null. If ticket is
+			// null - logical error and system must stop
+			Ticket ticket = getTicketById(id);
+			User user = new User(username);
+
+			if (TicketSystemConfig.USE_DATABASE) {
+
+				// if no user exists, then create user
+				// get assigned id of the user
+				// associate the assigned id with a ticket
+				if (ticket.getUser() == null) {
+					UserDao.addUser(user);
+					UserDao.getLastInsertedUserId();
+					TicketDao.setUserId(id, UserDao.getLastInsertedUserId()); // associate
+				} else {
+					//if the ticket is associated with a user then change the name of the user
+					user.setUserId(ticket.getUser().getUserId());
+					UserDao.addOrUpdateUser(user);
+					
+				} 
+			}
+			ticket.setUser(user);
+
 		} finally {
 			lock.unlock();
 			logger.debug("Tickets unlocked, writing operation finished.(Lock on TicketDao released by "
 					+ username + "'s thread)");
 		}
 	}
-	
-	
+
 	/**
 	 * Makes a copy of the arraylist. While reading - the data is locked. A copy
 	 * of the arraylist is needed for synchronization reasons. We need to be
@@ -180,14 +184,76 @@ private static ArrayList<Ticket> getTicketsFromDB(){
 	 */
 	public static List<Ticket> readTickets() {
 		lock.lock();
-		try{
-		logger.debug("Tickets locked for copy read operation");
-		ArrayList<Ticket> tickets = (ArrayList<Ticket>)(TicketTableImitation.tickets).clone();
-		logger.debug("Ticket data copied");
-		return tickets;
-		}finally{
+		try {
+			logger.debug("Tickets locked for copy read operation");
+			@SuppressWarnings("unchecked")
+			ArrayList<Ticket> tickets = (ArrayList<Ticket>) (TicketTableImitation.tickets)
+					.clone();
+			logger.debug("Ticket data copied");
+			return tickets;
+		} finally {
 			lock.unlock();
 			logger.debug("Copy read operation ended, lock released");
 		}
+	}
+
+	/**
+	 * Sets the userId of the ticket. This operation is done directly in the
+	 * database. UserId must not be -1, if the userId is -1 SQL Exception will
+	 * be logged and the method will return gracefully
+	 * 
+	 * @param ticketId
+	 */
+	private static void setUserId(Integer ticketId, Integer userId) {
+		Connection con = DataBaseUtil.getDatabaseConnection();
+		if (con == null) {
+			logger.error("Connection problem, updating userId failed");
+			return;
+		}
+		String updateQuery = "UPDATE ticket SET userId = ? WHERE id = ?";
+		logger.debug("Update query: " + "\"UPDATE ticket SET userId = " + userId + " WHERE id = " + ticketId +"\"" );
+		PreparedStatement stm = null;
+		try {
+			stm = con.prepareStatement(updateQuery);
+			stm.setInt(1, userId);
+			stm.setInt(2, ticketId);
+			stm.executeUpdate();
+		} catch (SQLException e) {
+			logger.error(e.toString());
+		} finally {
+			if (stm != null)
+				try {
+					stm.close();
+					con.close();
+				} catch (SQLException e) {
+					logger.error("Database access errors on close method", e);
+				}
+		}
+	}
+
+	/**
+	 * Traverses a collection of tickets and returns a ticket associated with id
+	 * 
+	 * @param ticketId
+	 *            - the ticketId we search
+	 * @return -
+	 */
+
+	private static Ticket getTicketById(Integer ticketId) {
+
+		List<Ticket> tickets = getTickets();
+		if (tickets != null) {
+			ListIterator<Ticket> iter = tickets.listIterator();
+			while (iter.hasNext()) {
+				Ticket ticket = (Ticket)iter.next();
+				if (ticketId == ticket.getId()) {
+					return ticket;
+				}
+			}
+			logger.debug("ticket id:  " + ticketId + " out of scope ");
+		} else
+			logger.debug("NullPointer on tickets collection");
+
+		return null;
 	}
 }
