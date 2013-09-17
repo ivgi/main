@@ -33,14 +33,24 @@
 				</configuration>
 			</plugin>
 
+			<!-- Javadoc plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<version>2.1</version>
+				<configuration>
+					<downloadSources>false</downloadSources>
+					<downloadJavadocs>true</downloadJavadocs>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 
 	<!-- Encoding problems fix -->
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-	</properties>
+	 <properties> <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding> 
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding> 
+		</properties> 
+
 
 	<dependencies>
 		<!-- JSF 2.2 libraries -->
@@ -148,6 +158,18 @@
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 			<version>5.1.18</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-core</artifactId>
+			<version>4.2.4.Final</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-entitymanager</artifactId>
+			<version>4.2.4.Final</version>
 		</dependency>
 
 	</dependencies>

@@ -74,7 +74,7 @@ public class TicketReservationService {
 
 		Integer ticketNum; // store the value of ticketId here
 		StringBuilder builder = new StringBuilder();
-		TicketTableImitation.init();
+		
 
 		// build the xml document
 		builder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>").append(

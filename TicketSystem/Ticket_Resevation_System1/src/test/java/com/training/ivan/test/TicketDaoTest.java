@@ -7,13 +7,15 @@ import junit.framework.TestCase;
 import com.training.dao.TicketDao;
 import com.training.ivan.Ticket;
 import com.training.ivan.User;
+import com.training.ivan.data.DatabaseListener;
+import com.training.ivan.data.JpaUtil;
 import com.training.ivan.data.TicketTableImitation;
 
 public class TicketDaoTest extends TestCase {
 	
 	private User user;
 	List<Ticket> tickets;
-	
+	DatabaseListener dl;
 	public TicketDaoTest(String testName){
 		super(testName);
 	}
@@ -25,7 +27,11 @@ public class TicketDaoTest extends TestCase {
 		
 		TicketTableImitation.init();
 		TicketTableImitation.clear(); // make sure the ticket data is cleared
-		tickets = TicketTableImitation.tickets; //TODO real db
+		// since this is not run on the server the persistance.xml file is 
+		// expected to be in resources/META-INF, not in WEB-INF/classes/META-INF
+		dl = new DatabaseListener();
+		dl.contextInitialized(null); // no servlet context just dummy for initializing db
+		tickets = TicketDao.getTickets(); 
 		
 		//add user ivan
 		TicketDao.setUsernameByTicketId(1, "Ivan");
@@ -51,6 +57,11 @@ public class TicketDaoTest extends TestCase {
 		assertEquals("Petkan",TicketDao.getUsernameByTicketId(3));
 		TicketDao.setUsernameByTicketId(3, null);
 		assertEquals(null,TicketDao.getUsernameByTicketId(3));
+	}
+	
+	
+	protected void tearDown() throws Exception{
+		dl.contextDestroyed(null); // no servlet context just database clear operations
 	}
 	
 

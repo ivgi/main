@@ -1,0 +1,69 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!--
+  ~ Hibernate, Relational Persistence for Idiomatic Java
+  ~
+  ~ Copyright (c) 2010, Red Hat Inc. or third-party contributors as
+  ~ indicated by the @author tags or express copyright attribution
+  ~ statements applied by the authors.  All third-party contributions are
+  ~ distributed under license by Red Hat Inc.
+  ~
+  ~ This copyrighted material is made available to anyone wishing to use, modify,
+  ~ copy, or redistribute it subject to the terms and conditions of the GNU
+  ~ Lesser General Public License, as published by the Free Software Foundation.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+  ~ or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+  ~ for more details.
+  ~
+  ~ You should have received a copy of the GNU Lesser General Public License
+  ~ along with this distribution; if not, write to:
+  ~ Free Software Foundation, Inc.
+  ~ 51 Franklin Street, Fifth Floor
+  ~ Boston, MA  02110-1301  USA
+  -->
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+
+    <session-factory>
+
+        <!-- Database connection settings -->
+        <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
+        <property name="connection.url">jdbc:mysql://localhost:3306/tickets_hyb</property>
+        <property name="connection.username">ivan</property>
+        <property name="connection.password">alabala</property>
+
+        <!-- Use the C3P0 connection pool. -->  
+        <property name="c3p0.min_size">3</property>  
+        <property name="c3p0.max_size">5</property>  
+        <property name="c3p0.timeout">1800</property>  
+
+        <!-- SQL dialect -->
+        <property name="dialect">org.hibernate.dialect.MySQLDialect</property>
+
+        <!-- Disable second-level cache. -->  
+        <property name="cache.provider_class">org.hibernate.cache.NoCacheProvider</property>  
+        <property name="cache.use_query_cache">false</property>  
+        <property name="cache.use_minimal_puts">false</property>  
+        <property name="max_fetch_depth">3</property>
+        
+        <!-- Bind the getCurrentSession() method to the thread. -->  
+        <property name="current_session_context_class">thread</property>
+
+        <!-- Echo all executed SQL to stdout -->
+        <property name="show_sql">true</property>
+         <property name="format_sql">true</property>  
+
+        <!-- Drop and re-create the database schema on startup -->
+        <property name="hbm2ddl.auto">create</property>
+
+        <!-- Names the annotated entity class -->
+        <mapping class="com.training.ivan.Ticket"/>
+        <mapping class="com.training.ivan.User"/>
+
+    </session-factory>
+
+</hibernate-configuration>

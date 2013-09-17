@@ -37,7 +37,7 @@ public class DataBaseUtil {
 			DataSource ds = (DataSource)initContext.lookup("java:/comp/env/jdbc/TICKETS");
 			Connection con = ds.getConnection();
 			if(con == null)
-				logger.info("Connection is null");
+				logger.info("JDBC Connection is null");
 			return con;
 		} catch (NamingException e) {
 			logger.error("Datasource lookup problem",e);
@@ -54,7 +54,7 @@ public class DataBaseUtil {
 	 */
 	public static void initDB(){
 		
-		logger.info("Initializing database ...");
+		logger.info("Initializing JDBC database ...");
 		Connection con = getDatabaseConnection();
 		if(con == null){
 			logger.info("Database not initialized!");
@@ -101,7 +101,7 @@ public class DataBaseUtil {
 			return;
 		}
 		Statement stm = null;
-		logger.info("Clearing db ...");
+		logger.info("Clearing JDBC db tables ...");
 		try {
 			stm = con.createStatement();
 			stm.execute("DELETE FROM ticket");

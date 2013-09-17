@@ -6,11 +6,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
+import javax.persistence.Query;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,11 +22,13 @@ import com.training.ivan.Ticket;
 import com.training.ivan.TicketSystemConfig;
 import com.training.ivan.User;
 import com.training.ivan.data.DataBaseUtil;
+import com.training.ivan.data.JpaUtil;
 import com.training.ivan.data.TicketTableImitation;
 
 /**
  * Class responsible for data manipulation of List&ltTicket&gt collection This
- * class also synchronizes reading and writing from ticket collections
+ * class also synchronizes reading and writing from ticket collections. Uses
+ * three sources - inMemory, JDBC connection, JPA connection
  * 
  * @author ivaniv
  * 
@@ -41,7 +46,7 @@ public class TicketDao {
 	 * 
 	 * @return list of tickets
 	 */
-	private static ArrayList<Ticket> getTicketsFromDB() {
+	private static ArrayList<Ticket> getTicketsFromJDBC() {
 
 		Connection con = DataBaseUtil.getDatabaseConnection();
 
@@ -59,7 +64,7 @@ public class TicketDao {
 				Integer ticketId = rs.getInt("id");
 				Integer userId = rs.getInt("userId");
 				User user = UserDao.getUserById(userId);
-				//logger.debug("ticket" + ticketId + "- user: " + user);
+				// logger.debug("ticket" + ticketId + "- user: " + user);
 				tickets.add(new Ticket(ticketId, user));
 			}
 		} catch (SQLException e) {
@@ -77,21 +82,53 @@ public class TicketDao {
 	}
 
 	/**
-	 * According to USE_DATABASE option, this method gets tickets from the
-	 * database. If USE_DATABASE option is disabled inMemory data is used
+	 * Retrieves all available tickets from t_tickets table and adds them to a
+	 * list
+	 * 
+	 * @return list of tickets
+	 */
+	private static ArrayList<Ticket> getTicketsFromJPA() {
+		EntityManager em = JpaUtil.getEntityManagerFactory()
+				.createEntityManager();
+		try {
+			Query query = em.createQuery("SELECT T FROM Ticket t ORDER BY t.id ASC");
+			ArrayList<Ticket> tickets = (ArrayList<Ticket>) (query.getResultList());
+			for(Ticket t: tickets)
+				System.out.println(t.getId() + " - " + t.getUser());
+			return tickets;
+		} catch (Exception e) {
+			logger.error("Error retrieving tickets from JPA database", e);
+		} finally {
+			em.close();
+		}
+		return null;
+	}
+
+	/**
+	 * This returns tickets from various datasources. If JPA is enabled it tries
+	 * to retrieve tickets through JPA. If the operation can not be completed
+	 * the method returns tickets through JDBC connection. If the operation can
+	 * not be completed, returns tickets from inMemory database;
 	 * 
 	 * @return list of all tickets
 	 */
 	public static ArrayList<Ticket> getTickets() {
-
-		if (TicketSystemConfig.USE_DATABASE) {
-
-			ArrayList<Ticket> tickets = getTicketsFromDB();
-
+		ArrayList<Ticket> tickets;
+		if (TicketSystemConfig.USE_JPA) {
+			tickets = getTicketsFromJPA();
+			if (tickets == null) {
+				logger.info("PROBLEM WITH JPA. DISABLEING JPA.");
+				TicketSystemConfig.USE_JPA = false;
+				// recursively calling the method
+				// will return JDBC tickets
+				return getTickets();
+			}
+			return tickets;
+		} else if (TicketSystemConfig.USE_DATABASE) {
+			tickets = getTicketsFromJDBC();
 			if (tickets == null) {
 				logger.info("PROBLEM WITH THE DATABASE, USING THE INNER MEMORY INSTEAD!");
 				TicketSystemConfig.USE_DATABASE = false;
-
 				// recursively calling the method
 				// will return inMemory tickets this time
 				return getTickets();
@@ -99,7 +136,7 @@ public class TicketDao {
 			return tickets;
 		} else {
 			logger.info("Using inMemory data");
-			return TicketTableImitation.tickets;
+			return readTickets();
 		}
 
 	}
@@ -150,22 +187,12 @@ public class TicketDao {
 			Ticket ticket = getTicketById(id);
 			User user = new User(username);
 
-			if (TicketSystemConfig.USE_DATABASE) {
+			if (TicketSystemConfig.USE_DATABASE)
+				setTicketUsernameJDBC(ticket, username);
+			if (TicketSystemConfig.USE_JPA) 
+				 setTicketUsernameJPA(ticket,username);
+			
 
-				// if no user exists, then create user
-				// get assigned id of the user
-				// associate the assigned id with a ticket
-				if (ticket.getUser() == null) {
-					UserDao.addUser(user);
-					UserDao.getLastInsertedUserId();
-					TicketDao.setUserId(id, UserDao.getLastInsertedUserId()); // associate
-				} else {
-					//if the ticket is associated with a user then change the name of the user
-					user.setUserId(ticket.getUser().getUserId());
-					UserDao.addOrUpdateUser(user);
-					
-				} 
-			}
 			ticket.setUser(user);
 
 		} finally {
@@ -176,13 +203,84 @@ public class TicketDao {
 	}
 
 	/**
+	 * This method updates the database through a JDBS connection This method is
+	 * not synchronized. It is intended to be used only in synchronized methods
+	 * 
+	 * @param ticket
+	 *            - the ticket which we work with
+	 * @param username
+	 *            - username of the corresponding user
+	 */
+	private static void setTicketUsernameJDBC(Ticket ticket, String username) {
+
+		User user = new User(username);
+		// if no user exists, then create user
+		// get assigned id of the user
+		// associate the assigned id with a ticket
+		if (ticket.getUser() == null) {
+			UserDao.addUser(user);
+			UserDao.getLastInsertedUserId();
+			TicketDao
+					.setUserId(ticket.getId(), UserDao.getLastInsertedUserId()); // associate
+		} else {
+			// if the ticket is associated with a user then change the name of
+			// the user
+			user.setUserId(ticket.getUser().getUserId());
+			UserDao.addOrUpdateUser(user);
+
+		}
+	}
+
+	/**
+	 * This method updates the database through a JPA mapping of entities This
+	 * method is not synchronized. It is intended to be used only in
+	 * synchronized methods
+	 * 
+	 * @param ticket
+	 *            - the ticket which we work with
+	 * @param username
+	 *            - username of the corresponding user
+	 */
+	public static void setTicketUsernameJPA(Ticket ticket, String username) {
+
+		EntityManager em = JpaUtil.getEntityManagerFactory()
+				.createEntityManager();
+		EntityTransaction tx = em.getTransaction();
+		try {
+			tx.begin();
+
+			// subtle detail - the ticket object passed will not be changed
+			// Java is 'pass by value'
+			ticket = em.find(Ticket.class, ticket.getId());
+
+			if (ticket.getUser() == null) {
+				User user = new User(username);
+				em.persist(user);
+				ticket.setUser(user);
+			} else
+				ticket.getUser().setUsername(username);
+
+			tx.commit();
+		} catch (Exception e) {
+			logger.error("Error occured updating JPA database", e);
+			if (tx != null && tx.isActive()) {
+				tx.rollback();
+				logger.info("Rolling back last transaction");
+			}
+		} finally {
+			em.close();
+		}
+	}
+
+	/**
+	 * 
 	 * Makes a copy of the arraylist. While reading - the data is locked. A copy
 	 * of the arraylist is needed for synchronization reasons. We need to be
 	 * sure that the read data are correct.
 	 * 
 	 * @return - returns a copy of the tickets arrayList
 	 */
-	public static List<Ticket> readTickets() {
+	public static ArrayList<Ticket> readTickets() {
 		lock.lock();
 		try {
 			logger.debug("Tickets locked for copy read operation");
@@ -211,7 +309,8 @@ public class TicketDao {
 			return;
 		}
 		String updateQuery = "UPDATE ticket SET userId = ? WHERE id = ?";
-		logger.debug("Update query: " + "\"UPDATE ticket SET userId = " + userId + " WHERE id = " + ticketId +"\"" );
+		logger.debug("Update query: " + "\"UPDATE ticket SET userId = "
+				+ userId + " WHERE id = " + ticketId + "\"");
 		PreparedStatement stm = null;
 		try {
 			stm = con.prepareStatement(updateQuery);
@@ -245,7 +344,7 @@ public class TicketDao {
 		if (tickets != null) {
 			ListIterator<Ticket> iter = tickets.listIterator();
 			while (iter.hasNext()) {
-				Ticket ticket = (Ticket)iter.next();
+				Ticket ticket = (Ticket) iter.next();
 				if (ticketId == ticket.getId()) {
 					return ticket;
 				}

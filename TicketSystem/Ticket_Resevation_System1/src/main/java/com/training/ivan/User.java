@@ -1,18 +1,27 @@
 package com.training.ivan;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table ( name = "t_users")
 public class User {
 	
+	@Column(name="username", length = 40)
 	private String username;
+	
+	@Id
+	@GeneratedValue
 	private int userId;
 	
 	public User(){
-		this.username = null;
-		this.userId = 0;
 	}
 	
 	public User(String username) {
 		this.username = username;
-		this.userId = 0;
 	}
 
 	public User(String username, int userId) {

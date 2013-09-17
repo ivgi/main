@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import com.training.dao.TicketDao;
 import com.training.ivan.data.DataBaseUtil;
+import com.training.ivan.data.JpaUtil;
 import com.training.ivan.data.TicketTableImitation;
 
 /**
@@ -56,11 +57,7 @@ public class TicketReservationBean {
 
 	@PostConstruct
 	public void init() {
-		logger.info("Initializing...");
-		
-		if (TicketTableImitation.tickets == null) {
-			TicketTableImitation.init();
-		}
+		logger.info("Initializing inmemmory data...");
 		
 		tickets = TicketDao.getTickets();
 		selectedTicket = -1;
@@ -72,10 +69,19 @@ public class TicketReservationBean {
 		
 		//clear inMemory data
 		TicketTableImitation.clear();
+		TicketTableImitation.init();
 		
-		//clear and initialize database data
+		if(TicketSystemConfig.USE_DATABASE){
+		//clear and initialize jdbc database data
 		DataBaseUtil.clearDB();
 		DataBaseUtil.initDB();
+		}
+		
+		if(TicketSystemConfig.USE_JPA){
+			//clear and initialize jpa database data
+			JpaUtil.clear();
+			JpaUtil.initDB();
+		}
 		
 		tickets = TicketDao.getTickets();
 		logger.debug("Done clearing data ...");

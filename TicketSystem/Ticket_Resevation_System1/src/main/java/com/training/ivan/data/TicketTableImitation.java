@@ -34,7 +34,6 @@ public class TicketTableImitation {
 	 */
 	public static void clear() {
 		tickets = null;
-		init();
 	}
 
 }

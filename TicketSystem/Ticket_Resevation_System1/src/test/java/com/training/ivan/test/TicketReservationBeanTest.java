@@ -4,6 +4,7 @@ import junit.framework.TestCase;
 
 import com.training.ivan.TicketReservationBean;
 import com.training.ivan.UserLogin;
+import com.training.ivan.data.DatabaseListener;
 
 /**
  * 
@@ -14,6 +15,7 @@ public class TicketReservationBeanTest extends TestCase {
 
 	TicketReservationBean bean;
 	UserLogin login;
+	DatabaseListener dl;
 
 	public TicketReservationBeanTest(String testName) {
 		super(testName);
@@ -21,6 +23,8 @@ public class TicketReservationBeanTest extends TestCase {
 
 	protected void setUp() throws Exception {
 		super.setUp();
+		dl = new DatabaseListener();
+		dl.contextInitialized(null); // no servlet context just dummy for initializing db
 		bean = new TicketReservationBean();
 		login = new UserLogin();
 		login.init();
@@ -61,6 +65,7 @@ public class TicketReservationBeanTest extends TestCase {
 
 	public void testDeclineReservationByTicketId() {
 		bean.clear();
+		
 		// Ivan reserves ticket 0
 		login.getUser().setUsername("Ivan");
 		bean.reserve(0);
@@ -79,6 +84,7 @@ public class TicketReservationBeanTest extends TestCase {
 
 	public void testNoUsernameReservation() {
 		bean.clear();
+		
 		login.getUser().setUsername(null);
 		assertEquals(null, login.getUser().getUsername());
 		assertEquals("green", bean.reservationCheck(0));
@@ -90,6 +96,7 @@ public class TicketReservationBeanTest extends TestCase {
 	 */
 	public void testUserCancelsReservation() {
 		bean.clear();
+		
 		login.getUser().setUsername("Ivan");
 		bean.reserve(0);
 		assertEquals("blue", bean.reservationCheck(0));
@@ -115,7 +122,6 @@ public class TicketReservationBeanTest extends TestCase {
 	 */
 	public void testTwoUsersSimultaniously(){
 		bean.clear();
-		
 		//Second user session initialization
 		TicketReservationBean bean2 = new TicketReservationBean();
 		UserLogin login2 = new UserLogin();
@@ -151,6 +157,10 @@ public class TicketReservationBeanTest extends TestCase {
 		bean.setTicketRequested(-1);
 		bean.sessionDestroyed();
 		assertEquals("blue",bean.reservationCheck(0));
+	}
+	
+	protected void tearDown(){
+		dl.contextDestroyed(null);// no servlet context used just dummy for clearing db
 	}
 
 
