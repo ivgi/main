@@ -7,6 +7,8 @@ import javax.faces.bean.SessionScoped;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.training.model.User;
+
 @ManagedBean(name="login")
 @SessionScoped
 public class UserLogin {

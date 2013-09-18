@@ -29,8 +29,8 @@
     <persistence-unit name="Ticket_Reservation_System1">
 
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
-        <class>com.training.ivan.Ticket</class>
-        <class>com.training.ivan.User</class>
+        <class>com.training.model.Ticket</class>
+        <class>com.training.model.User</class>
 
         <properties>
             <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver" />

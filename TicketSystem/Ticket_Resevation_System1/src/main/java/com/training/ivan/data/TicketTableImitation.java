@@ -2,8 +2,8 @@ package com.training.ivan.data;
 
 import java.util.ArrayList;
 
-import com.training.ivan.Ticket;
 import com.training.ivan.TicketSystemConfig;
+import com.training.model.Ticket;
 
 /**
  * 

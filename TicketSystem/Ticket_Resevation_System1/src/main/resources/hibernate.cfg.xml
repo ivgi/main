@@ -61,8 +61,8 @@
         <property name="hbm2ddl.auto">create</property>
 
         <!-- Names the annotated entity class -->
-        <mapping class="com.training.ivan.Ticket"/>
-        <mapping class="com.training.ivan.User"/>
+        <mapping class="com.training.model.Ticket"/>
+        <mapping class="com.training.model.User"/>
 
     </session-factory>
 

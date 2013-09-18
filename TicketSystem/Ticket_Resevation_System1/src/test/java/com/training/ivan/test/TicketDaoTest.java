@@ -5,11 +5,11 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import com.training.dao.TicketDao;
-import com.training.ivan.Ticket;
-import com.training.ivan.User;
 import com.training.ivan.data.DatabaseListener;
 import com.training.ivan.data.JpaUtil;
 import com.training.ivan.data.TicketTableImitation;
+import com.training.model.Ticket;
+import com.training.model.User;
 
 public class TicketDaoTest extends TestCase {
 	

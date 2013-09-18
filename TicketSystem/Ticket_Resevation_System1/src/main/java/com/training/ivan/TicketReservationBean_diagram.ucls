@@ -11,8 +11,8 @@
       <operations public="true" package="true" protected="true" private="true" static="true"/>    
     </display>  
   </class>  
-  <class id="2" language="java" name="com.training.ivan.User" project="Ticket_Resevation_System1" 
-    file="/Ticket_Resevation_System1/src/main/java/com/training/ivan/User.java" binary="false" corner="BOTTOM_RIGHT">    
+  <class id="2" language="java" name="com.training.model.User" project="Ticket_Resevation_System1" 
+    file="/Ticket_Resevation_System1/src/main/java/com/training/model/User.java" binary="false" corner="BOTTOM_RIGHT">    
     <position height="-1" width="-1" x="950" y="219"/>    
     <display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" accessors="true" 
       visibility="true">      

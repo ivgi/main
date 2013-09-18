@@ -13,9 +13,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.training.dao.TicketDao;
-import com.training.ivan.Ticket;
 import com.training.ivan.TicketSystemConfig;
 import com.training.ivan.data.TicketTableImitation;
+import com.training.model.Ticket;
 
 /**
  * @author ivaniv This class exposes web services for reservation of tickets

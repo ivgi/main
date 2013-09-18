@@ -15,6 +15,7 @@ import com.training.dao.TicketDao;
 import com.training.ivan.data.DataBaseUtil;
 import com.training.ivan.data.JpaUtil;
 import com.training.ivan.data.TicketTableImitation;
+import com.training.model.Ticket;
 
 /**
  * 

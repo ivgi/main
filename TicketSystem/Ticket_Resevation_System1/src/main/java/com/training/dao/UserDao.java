@@ -9,8 +9,8 @@ import java.sql.Statement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.training.ivan.User;
 import com.training.ivan.data.DataBaseUtil;
+import com.training.model.User;
 
 /**
  * Class responsible for user data operations with the database. If the database

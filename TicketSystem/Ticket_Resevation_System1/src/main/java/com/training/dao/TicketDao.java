@@ -18,12 +18,12 @@ import javax.persistence.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.training.ivan.Ticket;
 import com.training.ivan.TicketSystemConfig;
-import com.training.ivan.User;
 import com.training.ivan.data.DataBaseUtil;
 import com.training.ivan.data.JpaUtil;
 import com.training.ivan.data.TicketTableImitation;
+import com.training.model.Ticket;
+import com.training.model.User;
 
 /**
  * Class responsible for data manipulation of List&ltTicket&gt collection This
@@ -94,7 +94,7 @@ public class TicketDao {
 			Query query = em.createQuery("SELECT T FROM Ticket t ORDER BY t.id ASC");
 			ArrayList<Ticket> tickets = (ArrayList<Ticket>) (query.getResultList());
 			for(Ticket t: tickets)
-				System.out.println(t.getId() + " - " + t.getUser());
+				logger.debug(t.getId() + " - " + t.getUser());
 			return tickets;
 		} catch (Exception e) {
 			logger.error("Error retrieving tickets from JPA database", e);
