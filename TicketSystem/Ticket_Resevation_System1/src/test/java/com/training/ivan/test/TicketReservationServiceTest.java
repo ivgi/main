@@ -2,20 +2,16 @@ package com.training.ivan.test;
 
 import junit.framework.TestCase;
 
-import com.training.ivan.data.DatabaseListener;
-import com.training.ivan.data.TicketTableImitation;
+import com.training.ivan.TicketReservationBean;
 import com.training.ivan.webservices.TicketReservationService;
 
 public class TicketReservationServiceTest extends TestCase {
 	
 	TicketReservationService service; 
-	DatabaseListener dl;
 	
 	protected void setUp(){
-
-		dl = new DatabaseListener();
-		dl.contextInitialized(null); // no servlet context just dummy for initializing db
 		service = new TicketReservationService();
+		(new TicketReservationBean()).clear();
 	}
 	
 	public void testTakePlaceWebService(){
@@ -42,11 +38,4 @@ public class TicketReservationServiceTest extends TestCase {
 		
 	}
 	
-	protected void tearDown(){
-		dl.contextDestroyed(null); // no servlet context used just dummy for clearing db
-	}
-	
-	
-	
-
 }

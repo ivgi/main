@@ -1,6 +1,9 @@
 package com.training.ivan.test;
 
+import junit.extensions.TestSetup;
+import junit.framework.Test;
 import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 import com.training.ivan.TicketReservationBean;
 import com.training.ivan.UserLogin;
@@ -15,7 +18,6 @@ public class TicketReservationBeanTest extends TestCase {
 
 	TicketReservationBean bean;
 	UserLogin login;
-	DatabaseListener dl;
 
 	public TicketReservationBeanTest(String testName) {
 		super(testName);
@@ -23,8 +25,6 @@ public class TicketReservationBeanTest extends TestCase {
 
 	protected void setUp() throws Exception {
 		super.setUp();
-		dl = new DatabaseListener();
-		dl.contextInitialized(null); // no servlet context just dummy for initializing db
 		bean = new TicketReservationBean();
 		login = new UserLogin();
 		login.init();
@@ -37,6 +37,7 @@ public class TicketReservationBeanTest extends TestCase {
 		 */
 		bean.setLogin(login); 
 		bean.init();
+		bean.clear();
 	}
 
 	/**
@@ -44,7 +45,7 @@ public class TicketReservationBeanTest extends TestCase {
 	 */
 
 	public void testReservationByTickeId() {
-		bean.clear();
+		
 		// Ivan reserves ticket 0
 		login.getUser().setUsername("Ivan");
 		bean.reserve(0);
@@ -64,7 +65,6 @@ public class TicketReservationBeanTest extends TestCase {
 	 */
 
 	public void testDeclineReservationByTicketId() {
-		bean.clear();
 		
 		// Ivan reserves ticket 0
 		login.getUser().setUsername("Ivan");
@@ -83,7 +83,6 @@ public class TicketReservationBeanTest extends TestCase {
 	 */
 
 	public void testNoUsernameReservation() {
-		bean.clear();
 		
 		login.getUser().setUsername(null);
 		assertEquals(null, login.getUser().getUsername());
@@ -95,7 +94,6 @@ public class TicketReservationBeanTest extends TestCase {
 	 * current user
 	 */
 	public void testUserCancelsReservation() {
-		bean.clear();
 		
 		login.getUser().setUsername("Ivan");
 		bean.reserve(0);
@@ -109,7 +107,6 @@ public class TicketReservationBeanTest extends TestCase {
 	 * does not cancel the reservation
 	 */
 	public void testDeclineReservationNotAccepted() {
-		bean.clear();
 		login.getUser().setUsername("Ivan");
 		bean.reserve(0);
 		login.getUser().setUsername(null);
@@ -121,7 +118,7 @@ public class TicketReservationBeanTest extends TestCase {
 	 * Tests what happens when two users try to reserve the same slot simultaneously
 	 */
 	public void testTwoUsersSimultaniously(){
-		bean.clear();
+		
 		//Second user session initialization
 		TicketReservationBean bean2 = new TicketReservationBean();
 		UserLogin login2 = new UserLogin();
@@ -141,7 +138,7 @@ public class TicketReservationBeanTest extends TestCase {
 	 * Tests what happens when the user session expires
 	 */
 	public void testSessionKilledByUser(){
-		bean.clear();
+		
 		login.getUser().setUsername("Ivan");
 		bean.reserve(0);
 		bean.sessionDestroyed();
@@ -151,7 +148,6 @@ public class TicketReservationBeanTest extends TestCase {
 	 * User session expires, but the user has already reserved a ticket
 	 */
 	public void testSessionKilledByUserReserved(){
-		bean.clear();
 		login.getUser().setUsername("Petkan");
 		bean.reserve(0);
 		bean.setTicketRequested(-1);
@@ -159,9 +155,4 @@ public class TicketReservationBeanTest extends TestCase {
 		assertEquals("blue",bean.reservationCheck(0));
 	}
 	
-	protected void tearDown(){
-		dl.contextDestroyed(null);// no servlet context used just dummy for clearing db
-	}
-
-
 }
