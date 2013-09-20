@@ -15,9 +15,9 @@ public class TestExecutor extends TestSuite {
 	public static Test suite() {
 		
 		final TestSuite s = new TestSuite();
-		s.addTestSuite(TicketDaoTest.class);
-		s.addTestSuite(TicketReservationBeanTest.class);
-		s.addTestSuite(TicketReservationServiceTest.class);
+		s.addTestSuite(TicketDaoUnit.class);
+		s.addTestSuite(TicketReservationBeanUni.class);
+		s.addTestSuite(TicketReservationServiceUnit.class);
 		
 		/**
 		 * Global setUp and tearDown methods. This class is needed in order to

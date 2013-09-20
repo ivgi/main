@@ -7,11 +7,11 @@ import junit.framework.TestCase;
 import com.training.dao.TicketDao;
 import com.training.model.Ticket;
 
-public class TicketDaoTest extends TestCase {
+public class TicketDaoUnit extends TestCase {
 
 	List<Ticket> tickets;
 
-	public TicketDaoTest(String testName) {
+	public TicketDaoUnit(String testName) {
 		super(testName);
 	}
 

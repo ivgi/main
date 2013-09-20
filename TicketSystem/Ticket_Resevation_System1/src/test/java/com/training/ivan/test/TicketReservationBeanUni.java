@@ -14,12 +14,12 @@ import com.training.ivan.data.DatabaseListener;
  * @author ivaniv 
  * Test class for ticket reservation operations
  */
-public class TicketReservationBeanTest extends TestCase {
+public class TicketReservationBeanUni extends TestCase {
 
 	TicketReservationBean bean;
 	UserLogin login;
 
-	public TicketReservationBeanTest(String testName) {
+	public TicketReservationBeanUni(String testName) {
 		super(testName);
 	}
 

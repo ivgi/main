@@ -5,7 +5,7 @@ import junit.framework.TestCase;
 import com.training.ivan.TicketReservationBean;
 import com.training.ivan.webservices.TicketReservationService;
 
-public class TicketReservationServiceTest extends TestCase {
+public class TicketReservationServiceUnit extends TestCase {
 	
 	TicketReservationService service; 
 	
