@@ -1,13 +1,8 @@
 package com.training.ivan.test;
 
-import junit.extensions.TestSetup;
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
 import com.training.ivan.TicketReservationBean;
 import com.training.ivan.UserLogin;
-import com.training.ivan.data.DatabaseListener;
 
 /**
  * 

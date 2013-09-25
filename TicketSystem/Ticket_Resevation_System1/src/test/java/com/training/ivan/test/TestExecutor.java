@@ -4,9 +4,7 @@ import junit.extensions.TestSetup;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import com.training.dao.TicketDao;
 import com.training.ivan.data.DatabaseListener;
-import com.training.ivan.webservices.TicketReservationService;
 
 public class TestExecutor extends TestSuite {
 	static DatabaseListener dl;

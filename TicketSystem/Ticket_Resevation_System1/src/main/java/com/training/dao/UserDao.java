@@ -83,7 +83,7 @@ public class UserDao {
 			stm.setString(1, user.getUsername());
 			stm.execute();
 		} catch (SQLException e) {
-			logger.error(e.toString()); // TODO check if e.toString() is correct
+			logger.error(e.toString());
 		} finally {
 			if (stm != null)
 				try {
@@ -118,7 +118,7 @@ public class UserDao {
 			stm.setInt(2, user.getUserId());
 			stm.executeUpdate();
 		} catch (SQLException e) {
-			logger.error(e.toString()); // TODO check if e.toString() is correct
+			logger.error(e.toString());
 		} finally {
 			if (stm != null)
 				try {
@@ -162,7 +162,7 @@ public class UserDao {
 			logger.debug("Last inserted userId is: " + rs.getInt("id"));
 			return rs.getInt("id");
 		} catch (SQLException e) {
-			logger.error(e.toString()); // TODO check if e.toString() is correct
+			logger.error(e.toString()); 
 		} finally {
 			if (stm != null)
 				try {

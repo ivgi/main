@@ -20,19 +20,19 @@ public class TicketReservationServiceUnit extends TestCase {
 		StringBuilder builder = new StringBuilder();
 
 		// test success
-		builder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>").append("<status>");
+		builder.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>").append("<status>");
 		builder.append("successful reservation of ticket: 0").append("</status>");
 		assertEquals(builder.toString(), service.takePlace("0", "Ivan"));
 		
 		// test ticket out of scope
 		builder = new StringBuilder();
-		builder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>").append("<status>");
+		builder.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>").append("<status>");
 		builder.append("There is no ticket with id: 20").append("</status>");
 		assertEquals(builder.toString(), service.takePlace("20", "Ivan"));
 		
 		//test decline
 		builder = new StringBuilder();
-		builder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>").append("<status>");
+		builder.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>").append("<status>");
 		builder.append("ticket 0 is reserved by another user").append("</status>");
 		assertEquals(builder.toString(), service.takePlace("0", "Ivan"));
 		

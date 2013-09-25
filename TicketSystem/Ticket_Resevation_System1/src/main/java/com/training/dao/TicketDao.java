@@ -29,7 +29,6 @@ import com.training.model.User;
  * Class responsible for data manipulation of List&ltTicket&gt collection This
  * class also synchronizes reading and writing from ticket collections. Uses
  * three sources - inMemory, JDBC connection, JPA connection
- * 
  * @author ivaniv
  * 
  */
@@ -146,8 +145,7 @@ public class TicketDao {
 	 * is synchronized, i.e. only one thread at a time can iterate and read from
 	 * tickets
 	 * 
-	 * @param id
-	 *            - number of the ticket
+	 * @param id - number of the ticket
 	 * @return - associated user name
 	 */
 	public static String getUsernameByTicketId(Integer id) {
