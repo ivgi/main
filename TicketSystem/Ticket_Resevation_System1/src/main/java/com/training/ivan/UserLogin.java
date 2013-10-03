@@ -47,6 +47,7 @@ public class UserLogin {
 		setWrongUser(false);
 		if(user.getUsername() == null && user.getUsername().isEmpty()){
 			setWrongUser(true);
+			user.setUsername(null);
 			logger.debug("Wrong username");
 			return "userLogin.xhtml";
 		}

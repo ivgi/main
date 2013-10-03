@@ -218,8 +218,7 @@ public class TicketDao {
 		if (ticket.getUser() == null) {
 			UserDao.addUser(user);
 			UserDao.getLastInsertedUserId();
-			TicketDao
-					.setUserId(ticket.getId(), UserDao.getLastInsertedUserId()); // associate
+			TicketDao.setUserId(ticket.getId(), UserDao.getLastInsertedUserId()); // associate
 		} else {
 			// if the ticket is associated with a user then change the name of
 			// the user
@@ -241,8 +240,7 @@ public class TicketDao {
 	 */
 	public static void setTicketUsernameJPA(Ticket ticket, String username) {
 
-		EntityManager em = JpaUtil.getEntityManagerFactory()
-				.createEntityManager();
+		EntityManager em = JpaUtil.getEntityManagerFactory().createEntityManager();
 		EntityTransaction tx = em.getTransaction();
 		try {
 			tx.begin();
