@@ -1,4 +1,4 @@
-package com.test;
+package com.test.exceptions;
 
 
 /**
@@ -8,9 +8,9 @@ package com.test;
  *  Class for testing log4j vie slf4j functionality
  */
 
-public class Test {
+public class ExceptionFlow {
 	
-	Test(){
+	ExceptionFlow(){
 		int a = 6;
 		int b = 0;
 		System.out.println("test started!");
@@ -30,7 +30,7 @@ public class Test {
 
 	
 	public static void main(String args[]){
-		new Test();
+		new ExceptionFlow();
 		System.out.println("in main method");
 	}
 
